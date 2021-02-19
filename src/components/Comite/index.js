@@ -52,7 +52,7 @@ function Comite() {
                     <td>
                       <Link
                         className="text-link text-dark"
-                        to={`/comite/${btoa(value.id)}`}
+                        to={`/comite-update/${btoa(value.id)}`}
                       >
                         ver
                       </Link>

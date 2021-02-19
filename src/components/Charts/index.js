@@ -21,7 +21,7 @@ function Charts() {
   const data = React.useMemo(
     () => [
       {
-        label: 'Talatona',
+        label: 'Luanda',
         data: [
           [2017, 2],
           [2018, 3],
@@ -31,7 +31,7 @@ function Charts() {
         ],
       },
       {
-        label: 'K. Kiaxi',
+        label: 'Bengo',
         data: [
           [2017, 3],
           [2018, 2],
@@ -41,7 +41,7 @@ function Charts() {
         ],
       },
       {
-        label: 'Belas',
+        label: 'Huambo',
         data: [
           [2017, 6],
           [2018, 0],

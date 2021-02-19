@@ -1,18 +1,34 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import api from '../../services/Api';
 
-function ComiteCreate() {
+function ComiteUpdate() {
   const [nome, setNome] = useState('');
   const [comite_numero, setComite_numero] = useState('');
   const [comite_pai_id, setComite_pai_id] = useState(null);
   const [localizacao, setLocalizacao] = useState('');
-  const [descricao, setDescricao] = useState('');
   const [estado, setEstado] = useState('');
+  const [descricao, setDescricao] = useState('');
   const [comites, setComites] = useState([]);
+  const [comite, setComite] = useState([]);
+  const { comite_id } = useParams();
 
   useEffect(() => {
+    getComiteById(comite_id);
     getComites();
   }, []);
+
+  async function getComiteById(comite_id) {
+    const response = await api.get(`/comites/${comite_id}`);
+    const [res] = response.data;
+
+    setNome(res.nome);
+    setComite_numero(res.comite_numero);
+    setComite_pai_id(res.comite_pai_id);
+    setLocalizacao(res.localizacao);
+    setDescricao(res.descricao);
+    setEstado(res.estado);
+  }
 
   async function getComites() {
     const response = await api.get('/comites');
@@ -20,9 +36,10 @@ function ComiteCreate() {
       ? setComites(response.data)
       : setComites([...comites, response.data]);
   }
-  async function saveComite(e) {
+
+  async function updateComite(e) {
     e.preventDefault();
-    const response = await api.post('/comites', {
+    const response = await api.put(`/comites/${comite_id}`, {
       nome,
       comite_numero,
       comite_pai_id,
@@ -34,12 +51,13 @@ function ComiteCreate() {
     setComite_numero('');
     setComite_pai_id(null);
     setLocalizacao('');
+    setEstado('');
     setDescricao('');
   }
 
   return (
     <form>
-      <h3>Criar Comité</h3>
+      <h3>Actualização de dados do Comité</h3>
       <div className="row">
         <div className="col-lg-4 col-md-6 col-sm-12">
           <div className="form-group">
@@ -121,11 +139,14 @@ function ComiteCreate() {
           </div>
         </div>
       </div>
-      <button className="btn btn-master btn-lg btn-block" onClick={saveComite}>
-        Criar
+      <button
+        className="btn btn-master btn-lg btn-block"
+        onClick={updateComite}
+      >
+        Actualizar
       </button>
     </form>
   );
 }
 
-export default ComiteCreate;
+export default ComiteUpdate;

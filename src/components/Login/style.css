@@ -27,10 +27,13 @@
   box-shadow: none;
 }
 
-.outer-login h3 {
-  text-align: center;
-  margin: 0;
-  line-height: 1;
+.outer-login div.logo {
+  width: 340px;
+  height: 140px;
+  background-image: url('./siim.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  margin: 0 0 20px;
   padding: 0px;
 }
 

@@ -1,0 +1,7 @@
+.inner-carousel {
+  display: flex;
+  justify-content: center;
+}
+.carousel-root {
+  max-width: 75%;
+}

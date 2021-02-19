@@ -11,9 +11,7 @@ export default class Login extends Component {
       <div className="outer-login">
         <div className="inner-login">
           <form>
-            <h3>
-              <img src="/asset/img/logo192.webp" />
-            </h3>
+            <div className="logo"></div>
             <div className="form-group">
               <label>Nome de utilizador</label>
               <input

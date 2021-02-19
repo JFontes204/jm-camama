@@ -7,6 +7,7 @@ import Login from './components/Login';
 import User from './components/User';
 import UserCreate from './components/User/create';
 import Comite from './components/Comite';
+import ComiteUpdate from './components/Comite/update';
 import ComiteCreate from './components/Comite/create';
 import Nucleo from './components/Nucleo';
 import NucleoCreate from './components/Nucleo/create';
@@ -28,6 +29,10 @@ const Routes = () => (
           <PrivateRoute path="/user" component={User} />
           <PrivateRoute path="/user-create" component={UserCreate} />
           <PrivateRoute path="/comite" component={Comite} />
+          <PrivateRoute
+            path="/comite-update/:comite_id"
+            component={ComiteUpdate}
+          />
           <PrivateRoute path="/comite-create" component={ComiteCreate} />
           <PrivateRoute path="/nucleo" component={Nucleo} />
           <PrivateRoute path="/nucleo-create" component={NucleoCreate} />

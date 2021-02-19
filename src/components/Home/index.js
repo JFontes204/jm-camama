@@ -8,40 +8,50 @@ function Home() {
   return (
     <Loading
       myRender={() => (
-        <Carousel>
-          <div className="bg-white">
-            <img src="asset/img/1.png" />
-            <p className="legend">Camarada João Lourenço</p>
-          </div>
-          <div className="bg-white">
-            <img src="asset/img/2.png" />
-            <p className="legend">Presidente João Lourenço</p>
-          </div>
-          <div className="bg-white">
-            <img src="asset/img/3.png" />
-            <p className="legend">Presidente do Partido</p>
-          </div>
-          <div className="bg-white">
-            <img src="asset/img/4.png" />
-            <p className="legend">Camarada João Lourenço</p>
-          </div>
-          <div className="bg-white">
-            <img src="asset/img/5.png" />
-            <p className="legend">Presidente João Lourenço</p>
-          </div>
-          <div className="bg-white">
-            <img src="asset/img/6.png" />
-            <p className="legend">Presidente do Partido</p>
-          </div>
-          <div className="bg-white">
-            <img src="asset/img/7.png" />
-            <p className="legend">Presidente do Partido</p>
-          </div>
-          <div className="bg-white">
-            <img src="asset/img/8.png" />
-            <p className="legend">Camarada João Lourenço</p>
-          </div>
-        </Carousel>
+        <div className="inner-carousel">
+          <Carousel>
+            <div className="bg-white">
+              <img src="asset/img/11.jpg" />
+              <p className="legend">Camarada João Lourenço</p>
+            </div>
+            <div className="bg-white">
+              <img src="asset/img/12.jpg" />
+              <p className="legend">Presidente João Lourenço</p>
+            </div>
+            <div className="bg-white">
+              <img src="asset/img/13.jpeg" />
+              <p className="legend">Presidente do Partido</p>
+            </div>
+            <div className="bg-white">
+              <img src="asset/img/14.jpg" />
+              <p className="legend">Camarada João Lourenço</p>
+            </div>
+            <div className="bg-white">
+              <img src="asset/img/15.jpg" />
+              <p className="legend">Presidente João Lourenço</p>
+            </div>
+            <div className="bg-white">
+              <img src="asset/img/16.jpg" />
+              <p className="legend">Presidente do Partido</p>
+            </div>
+            <div className="bg-white">
+              <img src="asset/img/17.jpg" />
+              <p className="legend">Presidente do Partido</p>
+            </div>
+            <div className="bg-white">
+              <img src="asset/img/18.png" />
+              <p className="legend">Camarada João Lourenço</p>
+            </div>
+            <div className="bg-white">
+              <img src="asset/img/19.jpg" />
+              <p className="legend">Camarada João Lourenço</p>
+            </div>
+            <div className="bg-white">
+              <img src="asset/img/20.jpg" />
+              <p className="legend">Camarada João Lourenço</p>
+            </div>
+          </Carousel>
+        </div>
       )}
     />
   );
