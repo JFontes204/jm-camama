@@ -61,7 +61,7 @@ function Nucleo() {
                   );
                 })
               ) : (
-                <tr>Sem dados para mostrar neste momento.</tr>
+                <h5>Sem dados para mostrar neste momento.</h5>
               )}
             </tbody>
           </table>

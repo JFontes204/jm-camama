@@ -71,7 +71,7 @@ function Militante() {
                   );
                 })
               ) : (
-                <h3>Sem dados para mostrar neste momento.</h3>
+                <h5>Sem dados para mostrar neste momento.</h5>
               )}
             </tbody>
           </table>
