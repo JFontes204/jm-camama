@@ -7,7 +7,7 @@ const NavBarComponent = () => {
     <Navbar className="navbar-light text-white" expand="sm">
       <div className="container">
         <Link className="navbar-brand text-link-img" to={'/home'}>
-          MPLA SIIM
+          JMPLA SIIM
         </Link>
 
         <Navbar.Toggle aria-controls="collapsibleNavId" />
