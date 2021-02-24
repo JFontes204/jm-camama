@@ -27,12 +27,12 @@ function Militante() {
         <>
           <div className="row content-header">
             <div className="col-lg-3 col-md-3 col-sm-4 col-xs-12">
-              <Link
+              {/* <Link
                 className="text-link text-link-view"
                 to={'/militante-create'}
               >
                 <button className="btn btn-master mb-1">Novo Militante</button>
-              </Link>
+              </Link> */}
             </div>
             <h1 className="col-lg-9 col-md-9 col-sm-8 col-xs-12">
               Lista de Militantes
@@ -50,25 +50,29 @@ function Militante() {
               </tr>
             </thead>
             <tbody>
-              {militantes.map((value, key) => {
-                return (
-                  <tr key={key}>
-                    <td scope="row">{key + 1}</td>
-                    <td>{value.nome}</td>
-                    <td>{value.telefone1}</td>
-                    <td>{tempoDeMilitancia(value.ano_inicio_militancia)}</td>
-                    <td>{value.comites.nome}</td>
-                    <td>
-                      <Link
-                        className="text-link text-dark"
-                        to={`/militante/${btoa(value.id)}`}
-                      >
-                        ver
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
+              {militantes.length ? (
+                militantes.map((value, key) => {
+                  return (
+                    <tr key={key}>
+                      <td scope="row">{key + 1}</td>
+                      <td>{value.nome}</td>
+                      <td>{value.telefone1}</td>
+                      <td>{tempoDeMilitancia(value.ano_inicio_militancia)}</td>
+                      <td>{value.comites.nome}</td>
+                      <td>
+                        <Link
+                          className="text-link text-dark"
+                          to={`/militante/${btoa(value.id)}`}
+                        >
+                          ver
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>Sem dados para mostrar neste momento.</tr>
+              )}
             </tbody>
           </table>
         </>

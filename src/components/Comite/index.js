@@ -62,9 +62,7 @@ function Comite() {
                   );
                 })
               ) : (
-                <tr>
-                  <td scope="row">Sem dados para mostrar neste momento.</td>
-                </tr>
+                <tr>Sem dados para mostrar neste momento.</tr>
               )}
             </tbody>
           </table>
