@@ -28,18 +28,18 @@ export default class Login extends Component {
                 placeholder="Palavra-passe"
               />
             </div>
-            <div className="form-group">
+            {/* <div className="form-group">
               <div className="custom-control custom-checkbox">
                 <input
                   type="checkbox"
                   className="custom-control-input"
                   id="customCheck1"
                 />
-                {/* <label className="custom-control-label" htmlFor="customCheck1">
+               <label className="custom-control-label" htmlFor="customCheck1">
                   Lembrar-se
-                </label> */}
+                </label> 
               </div>
-            </div>
+            </div>*/}
             <Link to={'/home'} className="text-link">
               <button className="btn btn-lg btn-block btn-master">
                 Entrar
