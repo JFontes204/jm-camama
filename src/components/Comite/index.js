@@ -42,24 +42,30 @@ function Comite() {
               </tr>
             </thead>
             <tbody>
-              {comites.map((value, key) => {
-                return (
-                  <tr key={key}>
-                    <td scope="row">{key + 1}</td>
-                    <td>{value.nome}</td>
-                    <td>{value.comite_numero}</td>
-                    <td>{value.localizacao}</td>
-                    <td>
-                      <Link
-                        className="text-link text-dark"
-                        to={`/comite-update/${btoa(value.id)}`}
-                      >
-                        ver
-                      </Link>
-                    </td>
-                  </tr>
-                );
-              })}
+              {comites.length ? (
+                comites.map((value, key) => {
+                  return (
+                    <tr key={key}>
+                      <td scope="row">{key + 1}</td>
+                      <td>{value.nome}</td>
+                      <td>{value.comite_numero}</td>
+                      <td>{value.localizacao}</td>
+                      <td>
+                        <Link
+                          className="text-link text-dark"
+                          to={`/comite-update/${btoa(value.id)}`}
+                        >
+                          ver
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td scope="row">Sem dados para mostrar neste momento.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </>
