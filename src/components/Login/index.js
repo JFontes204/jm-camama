@@ -35,9 +35,9 @@ export default class Login extends Component {
                   className="custom-control-input"
                   id="customCheck1"
                 />
-                <label className="custom-control-label" htmlFor="customCheck1">
+                {/* <label className="custom-control-label" htmlFor="customCheck1">
                   Lembrar-se
-                </label>
+                </label> */}
               </div>
             </div>
             <Link to={'/home'} className="text-link">
