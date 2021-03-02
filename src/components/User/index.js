@@ -21,9 +21,9 @@ function User() {
         <>
           <div className="row content-header">
             <div className="col-lg-3 col-md-3 col-sm-4 col-xs-12">
-              {/* <Link className="text-link text-link-view" to={'/user-create'}>
+              <Link className="text-link text-link-view" to={'/user-create'}>
                 <button className="btn btn-master mb-1">Novo utilizador</button>
-              </Link> */}
+              </Link>
             </div>
             <h1 className="col-lg-9 col-md-9 col-sm-8 col-xs-12">
               Lista de utilizadores
