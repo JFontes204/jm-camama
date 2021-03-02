@@ -5,7 +5,7 @@ export default function Loading({ myRender }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 2500);
+    setTimeout(() => setLoading(false), 1500);
   }, []);
   return loading ? (
     <div className="d-flex justify-content-center align-items-center flex-column">
