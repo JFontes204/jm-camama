@@ -3,7 +3,7 @@ import env from 'react-dotenv';
 
 const encrypt = (str) => {
   const mykey = crypto.createCipher(
-    window.env.ALGHORITHM,
+    window.env.REACT_APP_ALGHORITHM,
     window.env.REACT_APP_APP_SECRET
   );
   let mystr = mykey.update(str, 'utf8', 'hex');
@@ -12,7 +12,7 @@ const encrypt = (str) => {
 };
 const decrypt = (str) => {
   const mykey = crypto.createDecipher(
-    window.env.ALGHORITHM,
+    window.env.REACT_APP_ALGHORITHM,
     window.env.REACT_APP_APP_SECRET
   );
   let mystr = mykey.update(str, 'hex', 'utf8');
