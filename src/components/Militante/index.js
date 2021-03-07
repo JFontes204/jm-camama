@@ -3,14 +3,20 @@ import { Link } from 'react-router-dom';
 import api from '../../services/Api';
 import Loading from '../Loading';
 
-function Militante() {
+function Militante({ user_id }) {
   const [militantes, setMilitantes] = useState([]);
   useEffect(() => {
     getMilitantes();
   }, []);
 
   const getMilitantes = async () => {
-    const response = await api.get('/militantes');
+    const { access_token } = JSON.parse(localStorage.getItem('token'));
+    const config = {
+      headers: {
+        Authorization: 'Bearer ' + access_token,
+      },
+    };
+    const response = await api.get('/militantes', config);
     militantes
       ? setMilitantes(response.data)
       : setMilitantes([...militantes, response.data]);
@@ -54,7 +60,7 @@ function Militante() {
                 militantes.map((value, key) => {
                   return (
                     <tr key={key}>
-                      <td scope="row">{key + 1}</td>
+                      <td>{key + 1}</td>
                       <td>{value.nome}</td>
                       <td>{value.telefone1}</td>
                       <td>{tempoDeMilitancia(value.ano_inicio_militancia)}</td>
@@ -71,7 +77,11 @@ function Militante() {
                   );
                 })
               ) : (
-                <h5>Sem dados para mostrar neste momento.</h5>
+                <tr>
+                  <td colSpan="6">
+                    <h5>Sem dados para mostrar neste momento.</h5>
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

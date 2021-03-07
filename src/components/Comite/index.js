@@ -4,14 +4,20 @@ import api from '../../services/Api';
 import Loading from '../Loading';
 import './style.css';
 
-function Comite() {
+function Comite({ user_id }) {
   const [comites, setComites] = useState([]);
   useEffect(() => {
     getComites();
   }, []);
 
   const getComites = async () => {
-    const response = await api.get('/comites');
+    const { access_token } = JSON.parse(localStorage.getItem('token'));
+    const config = {
+      headers: {
+        Authorization: 'Bearer ' + access_token,
+      },
+    };
+    const response = await api.get('/comites', config);
     comites
       ? setComites(response.data)
       : setComites([...comites, response.data]);
@@ -46,7 +52,7 @@ function Comite() {
                 comites.map((value, key) => {
                   return (
                     <tr key={key}>
-                      <td scope="row">{key + 1}</td>
+                      <td>{key + 1}</td>
                       <td>{value.nome}</td>
                       <td>{value.comite_numero}</td>
                       <td>{value.localizacao}</td>
@@ -62,7 +68,11 @@ function Comite() {
                   );
                 })
               ) : (
-                <h5>Sem dados para mostrar neste momento.</h5>
+                <tr>
+                  <td colSpan="5">
+                    <h5>Sem dados para mostrar neste momento.</h5>
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

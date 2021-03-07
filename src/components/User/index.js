@@ -4,14 +4,20 @@ import api from '../../services/Api';
 import Loading from '../Loading';
 import './style.css';
 
-function User() {
+function User({ user_id }) {
   const [users, setUsers] = useState([]);
   useEffect(() => {
     getUsers();
   }, []);
 
   const getUsers = async () => {
-    const response = await await api.get('/users');
+    const { access_token } = JSON.parse(localStorage.getItem('token'));
+    const config = {
+      headers: {
+        Authorization: 'Bearer ' + access_token,
+      },
+    };
+    const response = await api.get('/users', config);
     users ? setUsers(response.data) : setUsers([...users, response.data]);
   };
 
@@ -44,7 +50,7 @@ function User() {
                 users.map((value, key) => {
                   return (
                     <tr key={key}>
-                      <td scope="row">{key + 1}</td>
+                      <td>{key + 1}</td>
                       <td>{value.membros.nome}</td>
                       <td>{value.username}</td>
                       <td>{value.estado}</td>
@@ -60,7 +66,11 @@ function User() {
                   );
                 })
               ) : (
-                <h5>Sem dados para mostrar neste momento.</h5>
+                <tr>
+                  <td colSpan="5">
+                    <h5>Sem dados para mostrar neste momento.</h5>
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

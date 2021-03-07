@@ -4,14 +4,20 @@ import { Link } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import dataFormate from '../../utils/dataFormate';
 
-function Agenda() {
+function Agenda({ user_id }) {
   const [agenda, setAgenda] = useState([]);
   useEffect(() => {
     getAgenda();
   }, []);
 
   const getAgenda = async () => {
-    const response = await api.get('/agenda');
+    const { access_token } = JSON.parse(localStorage.getItem('token'));
+    const config = {
+      headers: {
+        Authorization: 'Bearer ' + access_token,
+      },
+    };
+    const response = await api.get('/agenda', config);
     agenda ? setAgenda(response.data) : setAgenda([...agenda, response.data]);
   };
 
@@ -45,7 +51,7 @@ function Agenda() {
                 agenda.map((value, key) => {
                   return (
                     <tr key={key}>
-                      <td scope="row">{key + 1}</td>
+                      <td>{key + 1}</td>
                       <td>{value.nome_actividade}</td>
                       <td>{value.local}</td>
                       <td>{dataFormate(value.data_e_hora)}</td>
@@ -62,7 +68,11 @@ function Agenda() {
                   );
                 })
               ) : (
-                <h5>Sem dados para mostrar neste momento.</h5>
+                <tr>
+                  <td colSpan="6">
+                    <h5>Sem dados para mostrar neste momento.</h5>
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

@@ -10,7 +10,6 @@ function ComiteUpdate() {
   const [estado, setEstado] = useState('');
   const [descricao, setDescricao] = useState('');
   const [comites, setComites] = useState([]);
-  const [comite, setComite] = useState([]);
   const { comite_id } = useParams();
 
   useEffect(() => {
@@ -44,15 +43,18 @@ function ComiteUpdate() {
       comite_numero,
       comite_pai_id,
       localizacao,
-      estado: 'Activo',
+      estado,
       descricao,
     });
-    setNome('');
-    setComite_numero('');
-    setComite_pai_id(null);
-    setLocalizacao('');
-    setEstado('');
-    setDescricao('');
+    if (Object.keys(response.data).length > 0) {
+      setNome('');
+      setComite_numero('');
+      setComite_pai_id(null);
+      setLocalizacao('');
+      setEstado('');
+      setDescricao('');
+      window.location.href = '/comite';
+    }
   }
 
   return (
@@ -111,6 +113,7 @@ function ComiteUpdate() {
             >
               <option value="Activo">Activo</option>
               <option value="Suspenso">Suspenso</option>
+              <option value="Fechado">Fechado</option>
               <option value="Em manutenção">Em manutenção</option>
               <option value="Por abrir">Por abrir</option>
             </select>

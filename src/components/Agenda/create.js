@@ -10,13 +10,20 @@ function Create() {
   const [convidados, setConvidados] = useState('');
   const [comite_id, setComite_id] = useState(null);
   const [comites, setComites] = useState([]);
+  const [config, setConfig] = useState({});
 
   useEffect(() => {
+    const { access_token } = JSON.parse(localStorage.getItem('token'));
+    setConfig({
+      headers: {
+        Authorization: 'Bearer ' + access_token,
+      },
+    });
     getComites();
   }, []);
 
   const getComites = async () => {
-    const response = await api.get('/comites');
+    const response = await api.get('/comites', config);
     comites
       ? setComites(response.data)
       : setComites([...comites, response.data]);
@@ -24,22 +31,29 @@ function Create() {
 
   const saveAgenda = async (e) => {
     e.preventDefault();
-    const response = await api.post('/agenda', {
-      nome_actividade,
-      local,
-      descricao,
-      data_e_hora: data + 'T' + hora + ':00.698Z',
-      convidados,
-      comite_id,
-      estado: 'Activo',
-    });
-    setNome_actividade('');
-    setLocal('');
-    setDescricao('');
-    setData('');
-    setHora('');
-    setConvidados('');
-    setComite_id(null);
+    const response = await api.post(
+      '/agenda',
+      {
+        nome_actividade,
+        local,
+        descricao,
+        data_e_hora: data + 'T' + hora + ':00.698Z',
+        convidados,
+        comite_id,
+        estado: 'Activo',
+      },
+      config
+    );
+    if (Object.keys(response.data).length > 0) {
+      setNome_actividade('');
+      setLocal('');
+      setDescricao('');
+      setData('');
+      setHora('');
+      setConvidados('');
+      setComite_id(null);
+      window.location.href = '/agenda';
+    }
   };
   return (
     <form>

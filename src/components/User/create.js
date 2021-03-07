@@ -6,22 +6,30 @@ function UserCreate(props) {
   const [password, setPassword] = useState('');
   const [membro_id, setMembro_id] = useState('');
   const [militantes, setMilitantes] = useState([]);
+  const [config, setConfig] = useState({});
 
   async function saveUser(e) {
     e.preventDefault();
-    const response = await api.post('/users', {
-      username,
-      password,
-      membro_id,
-      estado: 'Activo',
-    });
-    setUsername('');
-    setPassword('');
-    setMembro_id(null);
+    const response = await api.post(
+      '/users',
+      {
+        username,
+        password,
+        membro_id,
+        estado: 'Activo',
+      },
+      config
+    );
+    if (Object.keys(response.data).length > 0) {
+      setUsername('');
+      setPassword('');
+      setMembro_id(null);
+      window.location.href = '/user';
+    }
   }
 
   async function getMilitantes() {
-    const response = await api.get('/militantes');
+    const response = await api.get('/militantes', config);
 
     militantes
       ? setMilitantes(response.data)
@@ -29,6 +37,12 @@ function UserCreate(props) {
   }
 
   useEffect(() => {
+    const { access_token } = JSON.parse(localStorage.getItem('token'));
+    setConfig({
+      headers: {
+        Authorization: 'Bearer ' + access_token,
+      },
+    });
     getMilitantes();
   }, []);
   return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Chart } from 'react-charts';
 import { NavLink } from 'react-router-dom';
 import { Tabs, Tab } from 'react-bootstrap';

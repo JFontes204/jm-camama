@@ -9,32 +9,47 @@ function ComiteCreate() {
   const [descricao, setDescricao] = useState('');
   const [estado, setEstado] = useState('');
   const [comites, setComites] = useState([]);
+  const [config, setConfig] = useState({});
 
   useEffect(() => {
+    const { access_token } = JSON.parse(localStorage.getItem('token'));
+    setConfig({
+      headers: {
+        Authorization: 'Bearer ' + access_token,
+      },
+    });
     getComites();
   }, []);
 
   async function getComites() {
-    const response = await api.get('/comites');
+    const response = await api.get('/comites', config);
     comites
       ? setComites(response.data)
       : setComites([...comites, response.data]);
   }
   async function saveComite(e) {
     e.preventDefault();
-    const response = await api.post('/comites', {
-      nome,
-      comite_numero,
-      comite_pai_id,
-      localizacao,
-      estado: 'Activo',
-      descricao,
-    });
-    setNome('');
-    setComite_numero('');
-    setComite_pai_id(null);
-    setLocalizacao('');
-    setDescricao('');
+    const response = await api.post(
+      '/comites',
+      {
+        nome,
+        comite_numero,
+        comite_pai_id,
+        localizacao,
+        estado,
+        descricao,
+      },
+      config
+    );
+    if (Object.keys(response.data).length > 0) {
+      setNome('');
+      setComite_numero('');
+      setComite_pai_id(null);
+      setLocalizacao('');
+      setEstado('');
+      setDescricao('');
+      window.location.href = '/comite';
+    }
   }
 
   return (
@@ -93,6 +108,7 @@ function ComiteCreate() {
             >
               <option value="Activo">Activo</option>
               <option value="Suspenso">Suspenso</option>
+              <option value="Fechado">Fechado</option>
               <option value="Em manutenção">Em manutenção</option>
               <option value="Por abrir">Por abrir</option>
             </select>

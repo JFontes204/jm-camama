@@ -36,6 +36,8 @@
 #root .text-link-img {
   font-weight: 700;
   color: #f0d700;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 #root .text-link-img:hover {
   color: #fff;

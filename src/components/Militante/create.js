@@ -13,41 +13,58 @@ function User() {
   const [cartao_eleitoral_numero, setCartao_eleitoral_numero] = useState(null);
   const [comite_id, setComite_id] = useState(null);
   const [comites, setComites] = useState([]);
+  const [config, setConfig] = useState({});
 
   useEffect(() => {
+    const { access_token } = JSON.parse(localStorage.getItem('token'));
+    setConfig({
+      headers: {
+        Authorization: 'Bearer ' + access_token,
+      },
+    });
     getComites();
   }, []);
   async function getComites() {
-    const response = await api.get('/comites');
+    const response = await api.get('/comites', config);
     comites
       ? setComites(response.data)
       : setComites([...comites, response.data]);
   }
   async function saveMilitante(e) {
     e.preventDefault();
-    const response = await api.post('/militantes', {
-      nome,
-      email,
-      morada,
-      telefone1,
-      telefone2,
-      data_nascimento,
-      ano_inicio_militancia,
-      comite_id,
-      estado: 'Activo',
-      grupo_eleitoral_numero,
-      cartao_eleitoral_numero,
-    });
-    setNome('');
-    setEmail('');
-    setMorada('');
-    setTelefone1('');
-    setTelefone2('');
-    setData_nascimento('');
-    setAno_inicio_militancia('');
-    setComite_id(null);
-    setGrupo_eleitoral_numero('');
-    setCartao_eleitoral_numero('');
+    if (telefone2 === '') {
+      setTelefone2(0);
+    }
+    const response = await api.post(
+      '/militantes',
+      {
+        nome,
+        email,
+        morada,
+        telefone1,
+        telefone2,
+        data_nascimento,
+        ano_inicio_militancia,
+        comite_id,
+        estado: 'Activo',
+        grupo_eleitoral_numero,
+        cartao_eleitoral_numero,
+      },
+      config
+    );
+    if (Object.keys(response.data).length > 0) {
+      setNome('');
+      setEmail('');
+      setMorada('');
+      setTelefone1('');
+      setTelefone2('');
+      setData_nascimento('');
+      setAno_inicio_militancia('');
+      setComite_id(null);
+      setGrupo_eleitoral_numero('');
+      setCartao_eleitoral_numero('');
+      window.location.href = '/militante';
+    }
   }
 
   return (
@@ -75,6 +92,9 @@ function User() {
               onChange={(e) => setComite_id(e.target.value)}
               className="custom-select"
             >
+              <option key="-1" value="0">
+                Escolhe um Comité
+              </option>
               {comites.map((value, key) => (
                 <option key={key} value={value.id}>
                   {value.nome}
@@ -131,7 +151,7 @@ function User() {
             <input
               type="text"
               className="form-control"
-              placeholder="1985"
+              placeholder="1954"
               value={ano_inicio_militancia}
               onChange={(e) => setAno_inicio_militancia(e.target.value)}
             />

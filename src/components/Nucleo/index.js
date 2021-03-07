@@ -3,14 +3,20 @@ import { Link } from 'react-router-dom';
 import api from '../../services/Api';
 import Loading from '../Loading';
 
-function Nucleo() {
+function Nucleo({ user_id }) {
   const [nucleos, setNucleos] = useState([]);
   useEffect(() => {
     getNucleos();
   }, []);
 
   const getNucleos = async () => {
-    const response = await api.get('/nucleos');
+    const { access_token } = JSON.parse(localStorage.getItem('token'));
+    const config = {
+      headers: {
+        Authorization: 'Bearer ' + access_token,
+      },
+    };
+    const response = await api.get('/nucleos', config);
     nucleos
       ? setNucleos(response.data)
       : setNucleos([...nucleos, response.data]);
@@ -45,7 +51,7 @@ function Nucleo() {
                 nucleos.map((value, key) => {
                   return (
                     <tr key={key}>
-                      <td scope="row">{key + 1}</td>
+                      <td>{key + 1}</td>
                       <td>{value.nome}</td>
                       <td>{value.sigla}</td>
                       <td>{value.comites.nome}</td>
@@ -61,7 +67,11 @@ function Nucleo() {
                   );
                 })
               ) : (
-                <h5>Sem dados para mostrar neste momento.</h5>
+                <tr>
+                  <td colSpan="5">
+                    <h5>Sem dados para mostrar neste momento.</h5>
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>

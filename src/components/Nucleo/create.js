@@ -7,13 +7,20 @@ function Create() {
   const [descricao, setDescricao] = useState('');
   const [comite_id, setComite_id] = useState(null);
   const [comites, setComites] = useState([]);
+  const [config, setConfig] = useState({});
 
   useEffect(() => {
+    const { access_token } = JSON.parse(localStorage.getItem('token'));
+    setConfig({
+      headers: {
+        Authorization: 'Bearer ' + access_token,
+      },
+    });
     getComites();
   }, []);
 
   const getComites = async () => {
-    const response = await api.get('/comites');
+    const response = await api.get('/comites', config);
     comites
       ? setComites(response.data)
       : setComites([...comites, response.data]);
@@ -21,17 +28,24 @@ function Create() {
 
   const saveNucleo = async (e) => {
     e.preventDefault();
-    const response = await api.post('/nucleos', {
-      nome,
-      sigla,
-      descricao,
-      comite_id,
-      estado: 'Activo',
-    });
-    setNome('');
-    setSigla('');
-    setDescricao('');
-    setComite_id(null);
+    const response = await api.post(
+      '/nucleos',
+      {
+        nome,
+        sigla,
+        descricao,
+        comite_id,
+        estado: 'Activo',
+      },
+      config
+    );
+    if (Object.keys(response.data).length > 0) {
+      setNome('');
+      setSigla('');
+      setDescricao('');
+      setComite_id(null);
+      window.location.href = '/nucleo';
+    }
   };
   return (
     <form>

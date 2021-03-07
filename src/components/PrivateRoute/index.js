@@ -1,17 +1,22 @@
-import { Route, Redirect } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import isAuthenticated from '../../auth';
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
   return (
     <Route
       {...rest}
-      render={(props) =>
-        isAuthenticated() ? (
-          <Component {...props} />
-        ) : (
-          <Redirect to={{ pathname: '/', state: { from: props.location } }} />
-        )
-      }
+      render={(props) => {
+        const { success, error, user_id } = isAuthenticated();
+        if (success) {
+          return <Component {...props} user_id={user_id} />;
+        } else {
+          console.log('error:', error);
+          window.location.href = '/';
+          /* return (
+            <Redirect to={{ pathname: '/', state: { from: props.location } }} />
+            ); */
+        }
+      }}
     />
   );
 };
