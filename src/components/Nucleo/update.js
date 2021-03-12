@@ -3,27 +3,24 @@ import { useParams, Link } from 'react-router-dom';
 import { Modal, Toast } from 'react-bootstrap';
 import api from '../../services/Api';
 
-function AgendaUpdate() {
+function NucleoUpdate() {
   const [modalShow, setModalShow] = useState(false);
   const [toastShow, setToastShow] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [toastClasses, setToastClasses] = useState('');
-  const [nome_actividade, setNome_actividade] = useState('');
-  const [local, setLocal] = useState('');
+  const [nome, setNome] = useState('');
+  const [sigla, setSigla] = useState('');
   const [descricao, setDescricao] = useState('');
-  const [data, setData] = useState('');
-  const [hora, setHora] = useState('');
-  const [convidados, setConvidados] = useState('');
   const [estado, setEstado] = useState('');
-  const { agenda_id } = useParams();
+  const { nucleo_id } = useParams();
 
   useEffect(() => {
-    getAgendaById(agenda_id);
+    getNucleoById(nucleo_id);
   }, []);
 
-  async function getAgendaById(agenda_id) {
+  async function getNucleoById(nucleo_id) {
     try {
-      const response = await api.get(`/agenda/${agenda_id}`, {
+      const response = await api.get(`/nucleos/${nucleo_id}`, {
         headers: {
           Authorization: `Bearer ${
             JSON.parse(localStorage.getItem('token')).access_token
@@ -31,9 +28,9 @@ function AgendaUpdate() {
         },
       });
       const [res] = response.data;
-      setNome_actividade(res.nome_actividade);
-      setLocal(res.local);
-      setConvidados(res.convidados);
+      setNome(res.nome);
+      setSigla(res.sigla);
+      setEstado(res.estado);
       if (res.descricao === null) {
         setDescricao('');
       } else {
@@ -48,16 +45,14 @@ function AgendaUpdate() {
     }
   }
 
-  async function updateAgenda() {
+  async function updateNucleo() {
     setModalShow(false);
     try {
       const response = await api.put(
-        `/agenda/${agenda_id}`,
+        `/nucleos/${nucleo_id}`,
         {
-          nome_actividade,
-          local,
-          convidados,
-          data_e_hora: data + 'T' + hora + ':00.698Z',
+          nome,
+          sigla,
           estado,
           descricao,
         },
@@ -70,17 +65,14 @@ function AgendaUpdate() {
         }
       );
       if (Object.keys(response.data).length > 0) {
-        setNome_actividade('');
-        setLocal('');
-        setDescricao('');
-        setData('');
-        setHora('');
+        setNome('');
+        setSigla('');
         setEstado('');
-        setConvidados('');
+        setDescricao('');
         setToastMsg('Alterado com sucesso!');
         setToastClasses('text-dark');
         setToastShow(true);
-        setTimeout(() => (window.location.href = '/agenda'), 2000);
+        setTimeout(() => (window.location.href = '/nucleo'), 2000);
       } else {
         setToastMsg('Falha ao fazer as alterações!');
         setToastClasses('bg-warning text-white');
@@ -118,7 +110,7 @@ function AgendaUpdate() {
       <form>
         <div className="row content-header">
           <div className="col-lg-3 col-md-3 col-sm-4 col-xs-12">
-            <Link className="text-link text-link-view" to={'/agenda'}>
+            <Link className="text-link text-link-view" to={'/nucleo'}>
               <button className="btn btn-second mb-1">Voltar</button>
             </Link>
           </div>
@@ -129,60 +121,41 @@ function AgendaUpdate() {
         <div className="row">
           <div className="col-lg-4 col-md-6 col-sm-12">
             <div className="form-group">
-              <label>Nome da actividade</label>
+              <label>Nome</label>
               <input
                 type="text"
                 className="form-control"
-                placeholder="Nome da actividade"
-                value={nome_actividade}
-                onChange={(e) => setNome_actividade(e.target.value)}
+                placeholder="Nome do Núcleo"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
               />
             </div>
           </div>
           <div className="col-lg-4 col-md-6 col-sm-12">
             <div className="form-group">
-              <label>Local</label>
+              <label>Sigla</label>
               <input
                 type="text"
                 className="form-control"
-                placeholder="Local da actividade"
-                value={local}
-                onChange={(e) => setLocal(e.target.value)}
+                placeholder="Sigla"
+                value={sigla}
+                onChange={(e) => setSigla(e.target.value)}
               />
             </div>
           </div>
           <div className="col-lg-4 col-md-6 col-sm-12">
             <div className="form-group">
-              <label>Data</label>
-              <input
-                type="date"
-                className="form-control"
-                value={data}
-                onChange={(e) => setData(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="col-lg-4 col-md-6 col-sm-12">
-            <div className="form-group">
-              <label>Hora</label>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="ex.: 09:30"
-                value={hora}
-                onChange={(e) => setHora(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="col-lg-4 col-md-6 col-sm-12">
-            <div className="form-group">
-              <label>Convidados</label>
-              <textarea
-                className="form-control"
-                placeholder="Convidados para actividade"
-                value={convidados}
-                onChange={(e) => setConvidados(e.target.value)}
-              />
+              <label>Estado do núcleo</label>
+              <select
+                onChange={(e) => setEstado(e.target.value)}
+                className="custom-select"
+              >
+                <option value="0">Escolhe um estado</option>
+                <option value="Activo">Activo</option>
+                <option value="Suspenso">Suspenso</option>
+                <option value="Fechado">Fechado</option>
+                <option value="Por abrir">Por abrir</option>
+              </select>
             </div>
           </div>
           <div className="col-lg-4 col-md-6 col-sm-12">
@@ -193,22 +166,6 @@ function AgendaUpdate() {
                 value={descricao}
                 onChange={(e) => setDescricao(e.target.value)}
               />
-            </div>
-          </div>
-
-          <div className="col-lg-4 col-md-6 col-sm-12">
-            <div className="form-group">
-              <label>Estado da actividade</label>
-              <select
-                onChange={(e) => setEstado(e.target.value)}
-                className="custom-select"
-              >
-                <option value="0">Escolhe um estado</option>
-                <option value="Activa">Activa</option>
-                <option value="Cancelada">Cancelada</option>
-                <option value="Em analise">Em analise</option>
-                <option value="Realizada">Realizada</option>
-              </select>
             </div>
           </div>
         </div>
@@ -238,7 +195,7 @@ function AgendaUpdate() {
           <button className="btn btn-second" onClick={handleClose}>
             Cancelar
           </button>
-          <button className="btn btn-master" onClick={updateAgenda}>
+          <button className="btn btn-master" onClick={updateNucleo}>
             Confirmar
           </button>
         </Modal.Footer>
@@ -247,4 +204,4 @@ function AgendaUpdate() {
   );
 }
 
-export default AgendaUpdate;
+export default NucleoUpdate;

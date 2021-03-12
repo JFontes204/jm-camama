@@ -8,37 +8,37 @@ function MilitanteUpdate() {
   const [toastShow, setToastShow] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [toastClasses, setToastClasses] = useState('');
-  const [nome_actividade, setNome_actividade] = useState('');
-  const [local, setLocal] = useState('');
-  const [descricao, setDescricao] = useState('');
-  const [data, setData] = useState('');
-  const [hora, setHora] = useState('');
-  const [convidados, setConvidados] = useState('');
+  const [nome, setNome] = useState('');
+  const [email, setEmail] = useState('');
+  const [morada, setMorada] = useState('');
+  const [telefone1, setTelefone1] = useState('');
+  const [telefone2, setTelefone2] = useState('');
+  const [data_nascimento, setData_nascimento] = useState('');
+  const [ano_inicio_militancia, setAno_inicio_militancia] = useState('');
+  const [grupo_eleitoral_numero, setGrupo_eleitoral_numero] = useState('');
+  const [cartao_eleitoral_numero, setCartao_eleitoral_numero] = useState('');
+  const [comite_id, setComite_id] = useState(0);
+  const [comites, setComites] = useState([]);
   const [estado, setEstado] = useState('');
-  const { agenda_id } = useParams();
+  const { militante_id } = useParams();
 
   useEffect(() => {
-    getAgendaById(agenda_id);
+    getComites();
+    getMilitanteById(militante_id);
   }, []);
 
-  async function getAgendaById(agenda_id) {
+  async function getComites() {
     try {
-      const response = await api.get(`/agenda/${agenda_id}`, {
+      const response = await api.get('/comites/all/any', {
         headers: {
           Authorization: `Bearer ${
             JSON.parse(localStorage.getItem('token')).access_token
           }`,
         },
       });
-      const [res] = response.data;
-      setNome_actividade(res.nome_actividade);
-      setLocal(res.local);
-      setConvidados(res.convidados);
-      if (res.descricao === null) {
-        setDescricao('');
-      } else {
-        setDescricao(res.descricao);
-      }
+      comites
+        ? setComites(response.data)
+        : setComites([...comites, response.data]);
     } catch (err) {
       if (/status code 401$/i.test(err)) {
         setToastMsg('A sessão expirou! Sai e volte a entrar.');
@@ -48,18 +48,53 @@ function MilitanteUpdate() {
     }
   }
 
-  async function updateAgenda() {
+  async function getMilitanteById(militante_id) {
+    try {
+      const response = await api.get(`/militantes/${militante_id}`, {
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem('token')).access_token
+          }`,
+        },
+      });
+      const [res] = response.data;
+      setNome(res.nome);
+      setEmail(res.email);
+      setEstado(res.estado);
+      setMorada(res.morada);
+      setTelefone1(res.telefone1);
+      setTelefone2(res.telefone2);
+      setData_nascimento(res.data_nascimento);
+      setAno_inicio_militancia(res.ano_inicio_militancia);
+      setComite_id(res.comite_id);
+      setGrupo_eleitoral_numero(res.grupo_eleitoral_numero);
+      setCartao_eleitoral_numero(res.cartao_eleitoral_numero);
+    } catch (err) {
+      if (/status code 401$/i.test(err)) {
+        setToastMsg('A sessão expirou! Sai e volte a entrar.');
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+      }
+    }
+  }
+
+  async function updateMilitante() {
     setModalShow(false);
     try {
       const response = await api.put(
-        `/agenda/${agenda_id}`,
+        `/militantes/${militante_id}`,
         {
-          nome_actividade,
-          local,
-          convidados,
-          data_e_hora: data + 'T' + hora + ':00.698Z',
+          nome,
+          email,
+          morada,
+          telefone1,
+          telefone2: telefone2 === '' ? null : telefone2,
+          data_nascimento,
+          ano_inicio_militancia,
+          comite_id,
           estado,
-          descricao,
+          grupo_eleitoral_numero,
+          cartao_eleitoral_numero,
         },
         {
           headers: {
@@ -70,17 +105,21 @@ function MilitanteUpdate() {
         }
       );
       if (Object.keys(response.data).length > 0) {
-        setNome_actividade('');
-        setLocal('');
-        setDescricao('');
-        setData('');
-        setHora('');
+        setNome('');
+        setEmail('');
+        setMorada('');
+        setTelefone1('');
+        setTelefone2('');
+        setData_nascimento('');
+        setAno_inicio_militancia('');
+        setComite_id(0);
+        setGrupo_eleitoral_numero('');
+        setCartao_eleitoral_numero('');
         setEstado('');
-        setConvidados('');
         setToastMsg('Alterado com sucesso!');
         setToastClasses('text-dark');
         setToastShow(true);
-        setTimeout(() => (window.location.href = '/agenda'), 2500);
+        setTimeout(() => (window.location.href = '/militante'), 2000);
       } else {
         setToastMsg('Falha ao fazer as alterações!');
         setToastClasses('bg-warning text-white');
@@ -129,86 +168,144 @@ function MilitanteUpdate() {
         <div className="row">
           <div className="col-lg-4 col-md-6 col-sm-12">
             <div className="form-group">
-              <label>Nome da actividade</label>
+              <label>Nome</label>
               <input
                 type="text"
                 className="form-control"
-                placeholder="Nome da actividade"
-                value={nome_actividade}
-                onChange={(e) => setNome_actividade(e.target.value)}
+                placeholder="Nome do militante"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
               />
             </div>
           </div>
           <div className="col-lg-4 col-md-6 col-sm-12">
             <div className="form-group">
-              <label>Local</label>
+              <label>Comité</label>
+              <select
+                onChange={(e) => setComite_id(e.target.value)}
+                className="custom-select"
+              >
+                <option key="-1" value="0">
+                  Escolhe um Comité
+                </option>
+                {comites.map((value, key) => (
+                  <option key={key} value={value.id}>
+                    {value.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="col-lg-4 col-md-6 col-sm-12">
+            <div className="form-group">
+              <label>Telefone 1</label>
               <input
                 type="text"
                 className="form-control"
-                placeholder="Local da actividade"
-                value={local}
-                onChange={(e) => setLocal(e.target.value)}
+                placeholder="Telefone 1"
+                maxLength="9"
+                value={telefone1}
+                onChange={(e) => setTelefone1(e.target.value)}
               />
             </div>
           </div>
           <div className="col-lg-4 col-md-6 col-sm-12">
             <div className="form-group">
-              <label>Data</label>
-              <input
-                type="date"
-                className="form-control"
-                value={data}
-                onChange={(e) => setData(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="col-lg-4 col-md-6 col-sm-12">
-            <div className="form-group">
-              <label>Hora</label>
+              <label>Telefone 2</label>
               <input
                 type="text"
                 className="form-control"
-                placeholder="ex.: 09:30"
-                value={hora}
-                onChange={(e) => setHora(e.target.value)}
+                placeholder="Telefone 2"
+                maxLength="9"
+                value={telefone2}
+                onChange={(e) => setTelefone2(e.target.value)}
               />
             </div>
           </div>
           <div className="col-lg-4 col-md-6 col-sm-12">
             <div className="form-group">
-              <label>Convidados</label>
-              <textarea
+              <label>Data de Nascimento</label>
+              <input
+                type="text"
                 className="form-control"
-                placeholder="Convidados para actividade"
-                value={convidados}
-                onChange={(e) => setConvidados(e.target.value)}
+                placeholder="2021-02-01"
+                value={data_nascimento}
+                onChange={(e) => setData_nascimento(e.target.value)}
               />
             </div>
           </div>
           <div className="col-lg-4 col-md-6 col-sm-12">
             <div className="form-group">
-              <label>Descrição</label>
-              <textarea
+              <label>Data de Ingresso</label>
+              <input
+                type="text"
                 className="form-control"
-                value={descricao}
-                onChange={(e) => setDescricao(e.target.value)}
+                placeholder="1954"
+                value={ano_inicio_militancia}
+                onChange={(e) => setAno_inicio_militancia(e.target.value)}
               />
             </div>
           </div>
-
           <div className="col-lg-4 col-md-6 col-sm-12">
             <div className="form-group">
-              <label>Estado da actividade</label>
+              <label>Cartão Eleitoral nº</label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Cartão Eleitoral nº"
+                value={cartao_eleitoral_numero}
+                onChange={(e) => setCartao_eleitoral_numero(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="col-lg-4 col-md-6 col-sm-12">
+            <div className="form-group">
+              <label>Grupo Eleitoral nº</label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Grupo Eleitoral nº"
+                value={grupo_eleitoral_numero}
+                onChange={(e) => setGrupo_eleitoral_numero(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="col-lg-4 col-md-6 col-sm-12">
+            <div className="form-group">
+              <label>E-mail</label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="E-mail"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="col-lg-4 col-md-6 col-sm-12">
+            <div className="form-group">
+              <label>Estado do militante</label>
               <select
                 onChange={(e) => setEstado(e.target.value)}
                 className="custom-select"
               >
                 <option value="0">Escolhe um estado</option>
-                <option value="Activa">Activa</option>
-                <option value="Cancelada">Cancelada</option>
+                <option value="Activo">Activo</option>
+                <option value="Suspenso">Suspenso</option>
                 <option value="Em analise">Em analise</option>
-                <option value="Realizada">Realizada</option>
               </select>
+            </div>
+          </div>
+          <div className="col-lg-4 col-md-6 col-sm-12">
+            <div className="form-group">
+              <label>Morada</label>
+
+              <textarea
+                className="form-control"
+                placeholder="Morada"
+                value={morada}
+                onChange={(e) => setMorada(e.target.value)}
+              />
             </div>
           </div>
         </div>
@@ -238,7 +335,7 @@ function MilitanteUpdate() {
           <button className="btn btn-second" onClick={handleClose}>
             Cancelar
           </button>
-          <button className="btn btn-master" onClick={updateAgenda}>
+          <button className="btn btn-master" onClick={updateMilitante}>
             Confirmar
           </button>
         </Modal.Footer>

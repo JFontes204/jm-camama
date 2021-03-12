@@ -1,30 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Toast } from 'react-bootstrap';
 import api from '../../services/Api';
 import Loading from '../Loading';
 import './style.css';
 
 function User() {
+  const [toastShow, setToastShow] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastClasses, setToastClasses] = useState('');
   const [users, setUsers] = useState([]);
   useEffect(() => {
     getUsers();
   }, []);
 
-  const getUsers = async () => {
-    const { access_token } = JSON.parse(localStorage.getItem('token'));
-    const config = {
-      headers: {
-        Authorization: 'Bearer ' + access_token,
-      },
-    };
-    const response = await api.get('/users', config);
-    users ? setUsers(response.data) : setUsers([...users, response.data]);
-  };
+  async function getUsers() {
+    try {
+      const response = await api.get('/users', {
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem('token')).access_token
+          }`,
+        },
+      });
+      setUsers(response.data);
+    } catch (err) {
+      if (/status code 401$/i.test(err)) {
+        setToastMsg('A sessão expirou! Sai e volte a entrar.');
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+      }
+    }
+  }
 
   return (
     <Loading
       myRender={() => (
         <>
+          <Toast
+            onClose={() => setToastShow(false)}
+            show={toastShow}
+            delay={2500}
+            autohide
+          >
+            <Toast.Body className={`${toastClasses}`}>
+              <strong>{toastMsg}</strong>
+            </Toast.Body>
+          </Toast>
           <div className="row content-header">
             <div className="col-lg-3 col-md-3 col-sm-4 col-xs-12">
               <Link className="text-link text-link-view" to={'/user-create'}>
@@ -57,7 +79,7 @@ function User() {
                       <td>
                         <Link
                           className="text-link text-dark"
-                          to={`/comite/${btoa(value.id)}`}
+                          /* to={`/user-update/${btoa(value.id)}`} */
                         >
                           ver
                         </Link>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Toast } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import { Modal, Toast } from 'react-bootstrap';
 import api from '../../services/Api';
 
-function UserCreate(props) {
+function UserUpdate() {
+  const [modalShow, setModalShow] = useState(false);
   const [toastShow, setToastShow] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [toastClasses, setToastClasses] = useState('');
@@ -11,8 +12,11 @@ function UserCreate(props) {
   const [password, setPassword] = useState('');
   const [membro_id, setMembro_id] = useState('');
   const [militantes, setMilitantes] = useState([]);
+  const [estado, setEstado] = useState('');
+  const { user_id } = useParams();
 
   useEffect(() => {
+    getUserById(user_id);
     getMilitantes();
   }, []);
 
@@ -38,15 +42,36 @@ function UserCreate(props) {
     }
   }
 
-  async function saveUser(e) {
-    e.preventDefault();
+  async function getUserById(user_id) {
     try {
-      const response = await api.post(
-        '/users',
+      const response = await api.get(`/users/${user_id}`, {
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem('token')).access_token
+          }`,
+        },
+      });
+      const [res] = response.data;
+      setUsername(res.username);
+    } catch (err) {
+      if (/status code 401$/i.test(err)) {
+        setToastMsg('A sessão expirou! Sai e volte a entrar.');
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+      }
+    }
+  }
+
+  async function updateUser() {
+    setModalShow(false);
+    try {
+      const response = await api.put(
+        `/users/${user_id}`,
         {
           username,
           password,
           membro_id,
+          estado,
         },
         {
           headers: {
@@ -60,12 +85,13 @@ function UserCreate(props) {
         setUsername('');
         setPassword('');
         setMembro_id('');
-        setToastMsg('Criado com sucesso!');
+        setEstado('');
+        setToastMsg('Alterado com sucesso!');
         setToastClasses('text-dark');
         setToastShow(true);
         setTimeout(() => (window.location.href = '/user'), 2000);
       } else {
-        setToastMsg('Falha ao criar no utilizador!');
+        setToastMsg('Falha ao fazer as alterações!');
         setToastClasses('bg-warning text-white');
         setToastShow(true);
       }
@@ -73,13 +99,19 @@ function UserCreate(props) {
       if (/status code 401$/i.test(err)) {
         setToastMsg('A sessão expirou! Sai e volte a entrar.');
       } else {
-        setToastMsg('Falha ao criar no utilizador!');
+        setToastMsg('Falha ao fazer as alterações!');
       }
       setToastClasses('bg-warning text-white');
       setToastShow(true);
     }
   }
 
+  function handleClose() {
+    setModalShow(false);
+    setToastMsg('Alterações canceladas!');
+    setToastClasses('bg-warning text-white');
+    setToastShow(true);
+  }
   return (
     <>
       <Toast
@@ -100,7 +132,7 @@ function UserCreate(props) {
             </Link>
           </div>
           <h3 className="col-lg-9 col-md-9 col-sm-8 col-xs-12">
-            Criar utilizador
+            Actualização de dados do utilizador
           </h3>
         </div>
         <div className="row">
@@ -146,16 +178,53 @@ function UserCreate(props) {
               />
             </div>
           </div>
+          <div className="col-lg-4 col-md-6 col-sm-12">
+            <div className="form-group">
+              <label>Estado do utilizador</label>
+              <select
+                onChange={(e) => setEstado(e.target.value)}
+                className="custom-select"
+              >
+                <option value="0">Escolhe um estado</option>
+                <option value="Activo">Activo</option>
+                <option value="Bloqueado">Bloqueado</option>
+              </select>
+            </div>
+          </div>
         </div>
         <button
-          type="submit"
           className="btn btn-master btn-lg btn-block"
-          onClick={saveUser}
+          onClick={(e) => {
+            e.preventDefault();
+            setModalShow(true);
+          }}
         >
-          Criar
+          Actualizar
         </button>
       </form>
+      <Modal
+        show={modalShow}
+        onHide={handleClose}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title className="text-dark">Alerta - SIIM</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-dark">
+          Tem certeza que deseja realizar as alterações?
+        </Modal.Body>
+        <Modal.Footer>
+          <button className="btn btn-second" onClick={handleClose}>
+            Cancelar
+          </button>
+          <button className="btn btn-master" onClick={updateUser}>
+            Confirmar
+          </button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }
-export default UserCreate;
+
+export default UserUpdate;

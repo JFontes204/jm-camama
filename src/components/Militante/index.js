@@ -63,12 +63,15 @@ function Militante() {
                       <td>{key + 1}</td>
                       <td>{value.nome}</td>
                       <td>{value.telefone1}</td>
-                      <td>{tempoDeMilitancia(value.ano_inicio_militancia)}</td>
+                      <td>
+                        {tempoDeMilitancia(value.ano_inicio_militancia) +
+                          ' anos'}
+                      </td>
                       <td>{value.comites.nome}</td>
                       <td>
                         <Link
                           className="text-link text-dark"
-                          to={`/militante-update/${btoa(value.id)}`}
+                          /*  to={`/militante-update/${btoa(value.id)}`} */
                         >
                           ver
                         </Link>

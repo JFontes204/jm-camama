@@ -10,7 +10,7 @@ import {
   Card,
   Button,
 } from 'react-bootstrap';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import api from '../../services/Api';
 import Loading from '../Loading';
 import ListItems from './listItems';

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Toast } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import api from '../../services/Api';
@@ -14,33 +14,6 @@ function Create() {
   const [hora, setHora] = useState('');
   const [convidados, setConvidados] = useState('');
   const [estado, setEstado] = useState('');
-  const [comite_id, setComite_id] = useState(null);
-  const [comites, setComites] = useState([]);
-
-  useEffect(() => {
-    getComites();
-  }, []);
-
-  async function getComites() {
-    try {
-      const response = await api.get('/comites/all/any', {
-        headers: {
-          Authorization: `Bearer ${
-            JSON.parse(localStorage.getItem('token')).access_token
-          }`,
-        },
-      });
-      comites
-        ? setComites(response.data)
-        : setComites([...comites, response.data]);
-    } catch (err) {
-      if (/status code 401$/i.test(err)) {
-        setToastMsg('A sessão expirou! Sai e volte a entrar.');
-        setToastClasses('bg-warning text-white');
-        setToastShow(true);
-      }
-    }
-  }
 
   async function saveAgenda(e) {
     e.preventDefault();
@@ -74,9 +47,9 @@ function Create() {
         setToastMsg('Criado com sucesso!');
         setToastClasses('text-dark');
         setToastShow(true);
-        setTimeout(() => (window.location.href = '/agenda'), 2500);
+        setTimeout(() => (window.location.href = '/agenda'), 2000);
       } else {
-        setToastMsg('Falha ao criar novo actividade!');
+        setToastMsg('Falha ao criar nova actividade!');
         setToastClasses('bg-warning text-white');
         setToastShow(true);
       }
@@ -84,7 +57,7 @@ function Create() {
       if (/status code 401$/i.test(err)) {
         setToastMsg('A sessão expirou! Sai e volte a entrar.');
       } else {
-        setToastMsg('Falha ao criar novo actividade!');
+        setToastMsg('Falha ao criar nova actividade!');
       }
       setToastClasses('bg-warning text-white');
       setToastShow(true);
