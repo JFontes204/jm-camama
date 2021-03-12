@@ -9,7 +9,7 @@ export default function Logout(props) {
     // Set object into localStorage
     localStorage.setItem('token', JSON.stringify({ access_token: null }));
     localStorage.clear();
-    return <Loading myRender={() => ''} myMessege="Até breve!!!" />;
+    return <Loading myRender={() => ''} myMessage="Até breve!!!" />;
   }
 
   return typeof window !== undefined ? goOut() : '';

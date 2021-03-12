@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../../services/Api';
 import Loading from '../Loading';
 
-function Nucleo({ user_id }) {
+function Nucleo() {
   const [nucleos, setNucleos] = useState([]);
   useEffect(() => {
     getNucleos();
@@ -41,8 +41,8 @@ function Nucleo({ user_id }) {
               <tr>
                 <th>#</th>
                 <th>Nome</th>
-                <th>Sigla</th>
-                <th>Comité</th>
+                <th>Comité nº</th>
+                <th>Secretariado</th>
                 <th>Acção</th>
               </tr>
             </thead>
@@ -53,7 +53,7 @@ function Nucleo({ user_id }) {
                     <tr key={key}>
                       <td>{key + 1}</td>
                       <td>{value.nome}</td>
-                      <td>{value.sigla}</td>
+                      <td>{value.comites.comite_numero}</td>
                       <td>{value.comites.nome}</td>
                       <td>
                         <Link

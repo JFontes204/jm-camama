@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom/cjs/react-router-dom.min';
 import api from '../../services/Api';
 
 function User() {
@@ -9,9 +10,9 @@ function User() {
   const [telefone2, setTelefone2] = useState('');
   const [data_nascimento, setData_nascimento] = useState('');
   const [ano_inicio_militancia, setAno_inicio_militancia] = useState('');
-  const [grupo_eleitoral_numero, setGrupo_eleitoral_numero] = useState(null);
-  const [cartao_eleitoral_numero, setCartao_eleitoral_numero] = useState(null);
-  const [comite_id, setComite_id] = useState(null);
+  const [grupo_eleitoral_numero, setGrupo_eleitoral_numero] = useState(0);
+  const [cartao_eleitoral_numero, setCartao_eleitoral_numero] = useState(0);
+  const [comite_id, setComite_id] = useState(0);
   const [comites, setComites] = useState([]);
   const [config, setConfig] = useState({});
 
@@ -25,16 +26,13 @@ function User() {
     getComites();
   }, []);
   async function getComites() {
-    const response = await api.get('/comites', config);
+    const response = await api.get('/comites/all=*', config);
     comites
       ? setComites(response.data)
       : setComites([...comites, response.data]);
   }
   async function saveMilitante(e) {
     e.preventDefault();
-    if (telefone2 === '') {
-      setTelefone2(0);
-    }
     const response = await api.post(
       '/militantes',
       {
@@ -42,7 +40,7 @@ function User() {
         email,
         morada,
         telefone1,
-        telefone2,
+        telefone2: telefone2 === '' ? null : telefone2,
         data_nascimento,
         ano_inicio_militancia,
         comite_id,
@@ -60,7 +58,7 @@ function User() {
       setTelefone2('');
       setData_nascimento('');
       setAno_inicio_militancia('');
-      setComite_id(null);
+      setComite_id(0);
       setGrupo_eleitoral_numero('');
       setCartao_eleitoral_numero('');
       window.location.href = '/militante';
@@ -69,8 +67,16 @@ function User() {
 
   return (
     <form>
-      <h3>Criar Militante</h3>
-
+      <div className="row content-header">
+        <div className="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+          <Link className="text-link text-link-view" to={'/militante'}>
+            <button className="btn btn-second mb-1">Voltar</button>
+          </Link>
+        </div>
+        <h1 className="col-lg-9 col-md-9 col-sm-8 col-xs-12">
+          Criar novo Militante
+        </h1>
+      </div>
       <div className="row">
         <div className="col-lg-4 col-md-6 col-sm-12">
           <div className="form-group">
@@ -84,7 +90,6 @@ function User() {
             />
           </div>
         </div>
-
         <div className="col-lg-4 col-md-6 col-sm-12">
           <div className="form-group">
             <label>Comité</label>

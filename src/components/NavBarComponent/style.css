@@ -1,8 +1,16 @@
 #root .text-link-nav {
   color: #fff;
 }
-#root .text-link-nav:hover {
+#root #dropdown-in-nav {
+  color: #fff;
+  font-weight: 700;
+}
+#root .text-link-nav:hover,
+#root #dropdown-in-nav:hover {
   color: #f0d700;
+}
+#root .dropdown-item:hover {
+  background-color: #f0d700;
 }
 #root .text-link-nav:focus,
 #root .text-link-nav:visited,

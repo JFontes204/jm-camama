@@ -1,32 +1,52 @@
 import React, { useState, useEffect } from 'react';
+import { Toast } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import api from '../../services/Api';
 import Loading from '../Loading';
 import './style.css';
 
-function Comite({ user_id }) {
+function Comite() {
+  const [toastShow, setToastShow] = useState(false);
   const [comites, setComites] = useState([]);
   useEffect(() => {
     getComites();
   }, []);
 
-  const getComites = async () => {
-    const { access_token } = JSON.parse(localStorage.getItem('token'));
-    const config = {
-      headers: {
-        Authorization: 'Bearer ' + access_token,
-      },
-    };
-    const response = await api.get('/comites', config);
-    comites
-      ? setComites(response.data)
-      : setComites([...comites, response.data]);
-  };
+  async function getComites() {
+    try {
+      const response = await api.get('/comites', {
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem('token')).access_token
+          }`,
+        },
+      });
+      if (response.data) {
+        comites
+          ? setComites(response.data)
+          : setComites([...comites, response.data]);
+      }
+    } catch (err) {
+      if (/status code 401$/i.test(err)) {
+        setToastShow(true);
+      }
+    }
+  }
 
   return (
     <Loading
       myRender={() => (
         <>
+          <Toast
+            onClose={() => setToastShow(false)}
+            show={toastShow}
+            delay={6000}
+            autohide
+          >
+            <Toast.Body className="bg-warning text-white">
+              <strong>A sessão expirou! Sai e volte a entrar.</strong>
+            </Toast.Body>
+          </Toast>
           <div className="row content-header">
             <div className="col-lg-3 col-md-3 col-sm-4 col-xs-12">
               <Link className="text-link text-link-view" to={'/comite-create'}>
@@ -41,8 +61,8 @@ function Comite({ user_id }) {
             <thead className="thead-inverse thead-dark">
               <tr>
                 <th>#</th>
-                <th>Nome</th>
-                <th>Nº</th>
+                <th>Descrição</th>
+                <th>Comité nº</th>
                 <th>Localização</th>
                 <th>Acção</th>
               </tr>
@@ -57,12 +77,12 @@ function Comite({ user_id }) {
                       <td>{value.comite_numero}</td>
                       <td>{value.localizacao}</td>
                       <td>
-                        <Link
+                        <a
                           className="text-link text-dark"
-                          to={`/comite-update/${btoa(value.id)}`}
+                          href={'/comite-update/' + btoa(value.id)}
                         >
                           ver
-                        </Link>
+                        </a>
                       </td>
                     </tr>
                   );

@@ -1,14 +1,14 @@
 import { Route } from 'react-router-dom';
-import isAuthenticated from '../../auth';
+import isAuthenticated from '../../services/auth';
 
 const PrivateRoute = ({ component: Component, ...rest }) => {
   return (
     <Route
       {...rest}
       render={(props) => {
-        const { success, error, user_id } = isAuthenticated();
+        const { success, error } = isAuthenticated();
         if (success) {
-          return <Component {...props} user_id={user_id} />;
+          return <Component {...props} />;
         } else {
           console.log('error:', error);
           window.location.href = '/';

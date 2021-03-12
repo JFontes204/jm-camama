@@ -4,7 +4,7 @@ import api from '../../services/Api';
 import Loading from '../Loading';
 import './style.css';
 
-function User({ user_id }) {
+function User() {
   const [users, setUsers] = useState([]);
   useEffect(() => {
     getUsers();

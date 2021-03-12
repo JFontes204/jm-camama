@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import api from '../../services/Api';
 import Loading from '../Loading';
 
-function Militante({ user_id }) {
+function Militante() {
   const [militantes, setMilitantes] = useState([]);
   useEffect(() => {
     getMilitantes();
@@ -68,7 +68,7 @@ function Militante({ user_id }) {
                       <td>
                         <Link
                           className="text-link text-dark"
-                          to={`/militante/${btoa(value.id)}`}
+                          to={`/militante-update/${btoa(value.id)}`}
                         >
                           ver
                         </Link>

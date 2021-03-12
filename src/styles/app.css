@@ -45,6 +45,15 @@
   background: #cb0e08;
   color: #ffffff;
 }
+.btn-second {
+  background: #f0d700;
+  color: #ffffff;
+}
+.btn-second:hover {
+  background: #333;
+  color: #ffffff;
+  transition: background 0.8s;
+}
 .content-header {
   display: flex;
   align-items: center;

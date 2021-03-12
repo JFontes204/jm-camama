@@ -1,30 +1,53 @@
 import Loading from '../Loading';
 import api from '../../services/Api';
 import { Link } from 'react-router-dom';
+import { Toast } from 'react-bootstrap';
 import React, { useState, useEffect } from 'react';
 import dataFormate from '../../utils/dataFormate';
 
-function Agenda({ user_id }) {
+function Agenda() {
+  const [toastShow, setToastShow] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastClasses, setToastClasses] = useState('');
   const [agenda, setAgenda] = useState([]);
+
   useEffect(() => {
     getAgenda();
   }, []);
 
-  const getAgenda = async () => {
-    const { access_token } = JSON.parse(localStorage.getItem('token'));
-    const config = {
-      headers: {
-        Authorization: 'Bearer ' + access_token,
-      },
-    };
-    const response = await api.get('/agenda', config);
-    agenda ? setAgenda(response.data) : setAgenda([...agenda, response.data]);
-  };
+  async function getAgenda() {
+    try {
+      const response = await api.get('/agenda', {
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem('token')).access_token
+          }`,
+        },
+      });
+      agenda ? setAgenda(response.data) : setAgenda([...agenda, response.data]);
+    } catch (err) {
+      if (/status code 401$/i.test(err)) {
+        setToastMsg('A sessão expirou! Sai e volte a entrar.');
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+      }
+    }
+  }
 
   return (
     <Loading
       myRender={() => (
         <>
+          <Toast
+            onClose={() => setToastShow(false)}
+            show={toastShow}
+            delay={2500}
+            autohide
+          >
+            <Toast.Body className={`${toastClasses}`}>
+              <strong>{toastMsg}</strong>
+            </Toast.Body>
+          </Toast>
           <div className="row content-header">
             <div className="col-lg-3 col-md-3 col-sm-4 col-xs-12">
               <Link to="/agenda-create" className="text-link text-link-view">
@@ -42,7 +65,7 @@ function Agenda({ user_id }) {
                 <th>Actividade</th>
                 <th>Local</th>
                 <th>Data & hora</th>
-                <th>Comité</th>
+                <th>Secretariado</th>
                 <th>Acção</th>
               </tr>
             </thead>
@@ -57,12 +80,12 @@ function Agenda({ user_id }) {
                       <td>{dataFormate(value.data_e_hora)}</td>
                       <td>{value.comites.nome}</td>
                       <td>
-                        <Link
+                        <a
                           className="text-link text-dark"
-                          to={`/nucleo/${btoa(value.id)}`}
+                          href={'/agenda-update/' + btoa(value.id)}
                         >
                           ver
-                        </Link>
+                        </a>
                       </td>
                     </tr>
                   );

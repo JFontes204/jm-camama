@@ -4,7 +4,7 @@ import Loading from '../Loading';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import { Carousel } from 'react-responsive-carousel';
 
-function Home({ user_id }) {
+function Home() {
   return (
     <Loading
       myRender={() => (

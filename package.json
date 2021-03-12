@@ -6,7 +6,7 @@
   "author": "JFontes",
   "license": "MIT",
   "scripts": {
-    "start": "react-dotenv && react-scripts start",
+    "start": "react-scripts start",
     "build": "react-dotenv && react-scripts build",
     "serve": "react-dotenv && serve build",
     "test": "react-scripts test",

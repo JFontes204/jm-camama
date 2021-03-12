@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom/cjs/react-router-dom.min';
 import api from '../../services/Api';
 
 function Create() {
@@ -20,7 +21,7 @@ function Create() {
   }, []);
 
   const getComites = async () => {
-    const response = await api.get('/comites', config);
+    const response = await api.get('/comites/all=*', config);
     comites
       ? setComites(response.data)
       : setComites([...comites, response.data]);
@@ -49,7 +50,16 @@ function Create() {
   };
   return (
     <form>
-      <h3>Criar Núcleo</h3>
+      <div className="row content-header">
+        <div className="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+          <Link className="text-link text-link-view" to={'/nucleo'}>
+            <button className="btn btn-second mb-1">Voltar</button>
+          </Link>
+        </div>
+        <h1 className="col-lg-9 col-md-9 col-sm-8 col-xs-12">
+          Criar novo Núcleo
+        </h1>
+      </div>
       <div className="row">
         <div className="col-lg-4 col-md-6 col-sm-12">
           <div className="form-group">
@@ -82,6 +92,9 @@ function Create() {
               onChange={(e) => setComite_id(e.target.value)}
               className="custom-select"
             >
+              <option key="-1" value="0">
+                Escolhe um Comité
+              </option>
               {comites.map((value, key) => (
                 <option key={key} value={value.id}>
                   {value.nome}

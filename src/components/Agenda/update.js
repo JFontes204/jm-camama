@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Toast } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
+import { Modal, Toast } from 'react-bootstrap';
 import api from '../../services/Api';
 
-function Create() {
+function AgendaUpdate() {
+  const [modalShow, setModalShow] = useState(false);
   const [toastShow, setToastShow] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [toastClasses, setToastClasses] = useState('');
@@ -14,25 +15,30 @@ function Create() {
   const [hora, setHora] = useState('');
   const [convidados, setConvidados] = useState('');
   const [estado, setEstado] = useState('');
-  const [comite_id, setComite_id] = useState(null);
-  const [comites, setComites] = useState([]);
+  const { agenda_id } = useParams();
 
   useEffect(() => {
-    getComites();
+    getAgendaById(agenda_id);
   }, []);
 
-  async function getComites() {
+  async function getAgendaById(agenda_id) {
     try {
-      const response = await api.get('/comites/all/any', {
+      const response = await api.get(`/agenda/${agenda_id}`, {
         headers: {
           Authorization: `Bearer ${
             JSON.parse(localStorage.getItem('token')).access_token
           }`,
         },
       });
-      comites
-        ? setComites(response.data)
-        : setComites([...comites, response.data]);
+      const [res] = response.data;
+      setNome_actividade(res.nome_actividade);
+      setLocal(res.local);
+      setConvidados(res.convidados);
+      if (res.descricao === null) {
+        setDescricao('');
+      } else {
+        setDescricao(res.descricao);
+      }
     } catch (err) {
       if (/status code 401$/i.test(err)) {
         setToastMsg('A sessão expirou! Sai e volte a entrar.');
@@ -42,18 +48,18 @@ function Create() {
     }
   }
 
-  async function saveAgenda(e) {
-    e.preventDefault();
+  async function updateAgenda() {
+    setModalShow(false);
     try {
-      const response = await api.post(
-        '/agenda',
+      const response = await api.put(
+        `/agenda/${agenda_id}`,
         {
           nome_actividade,
           local,
-          descricao,
-          data_e_hora: data + 'T' + hora + ':00.698Z',
           convidados,
+          data_e_hora: data + 'T' + hora + ':00.698Z',
           estado,
+          descricao,
         },
         {
           headers: {
@@ -71,12 +77,12 @@ function Create() {
         setHora('');
         setEstado('');
         setConvidados('');
-        setToastMsg('Criado com sucesso!');
+        setToastMsg('Alterado com sucesso!');
         setToastClasses('text-dark');
         setToastShow(true);
         setTimeout(() => (window.location.href = '/agenda'), 2500);
       } else {
-        setToastMsg('Falha ao criar novo actividade!');
+        setToastMsg('Falha ao fazer as alterações!');
         setToastClasses('bg-warning text-white');
         setToastShow(true);
       }
@@ -84,11 +90,18 @@ function Create() {
       if (/status code 401$/i.test(err)) {
         setToastMsg('A sessão expirou! Sai e volte a entrar.');
       } else {
-        setToastMsg('Falha ao criar novo actividade!');
+        setToastMsg('Falha ao fazer as alterações!');
       }
       setToastClasses('bg-warning text-white');
       setToastShow(true);
     }
+  }
+
+  function handleClose() {
+    setModalShow(false);
+    setToastMsg('Alterações canceladas!');
+    setToastClasses('bg-warning text-white');
+    setToastShow(true);
   }
   return (
     <>
@@ -110,7 +123,7 @@ function Create() {
             </Link>
           </div>
           <h3 className="col-lg-9 col-md-9 col-sm-8 col-xs-12">
-            Criar nova actividade
+            Actualização de dados da actividade
           </h3>
         </div>
         <div className="row">
@@ -172,25 +185,6 @@ function Create() {
               />
             </div>
           </div>
-          {/* <div className="col-lg-4 col-md-6 col-sm-12">
-            <div className="form-group">
-              <label>Comité organizador</label>
-              <select
-                onChange={(e) => setComite_id(e.target.value)}
-                className="custom-select"
-              >
-                <option key="-1" value="0">
-                  Escolhe um Comité
-                </option>
-                {comites.map((value, key) => (
-                  <option key={key} value={value.id}>
-                    {value.nome}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div> */}
-
           <div className="col-lg-4 col-md-6 col-sm-12">
             <div className="form-group">
               <label>Descrição</label>
@@ -202,7 +196,7 @@ function Create() {
             </div>
           </div>
 
-          {/* <div className="col-lg-4 col-md-6 col-sm-12">
+          <div className="col-lg-4 col-md-6 col-sm-12">
             <div className="form-group">
               <label>Estado da actividade</label>
               <select
@@ -216,18 +210,41 @@ function Create() {
                 <option value="Realizada">Realizada</option>
               </select>
             </div>
-          </div> */}
+          </div>
         </div>
         <button
-          type="submit"
           className="btn btn-master btn-lg btn-block"
-          onClick={saveAgenda}
+          onClick={(e) => {
+            e.preventDefault();
+            setModalShow(true);
+          }}
         >
-          Criar
+          Actualizar
         </button>
       </form>
+      <Modal
+        show={modalShow}
+        onHide={handleClose}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title className="text-dark">Alerta - SIIM</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-dark">
+          Tem certeza que deseja realizar as alterações?
+        </Modal.Body>
+        <Modal.Footer>
+          <button className="btn btn-second" onClick={handleClose}>
+            Cancelar
+          </button>
+          <button className="btn btn-master" onClick={updateAgenda}>
+            Confirmar
+          </button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }
 
-export default Create;
+export default AgendaUpdate;
