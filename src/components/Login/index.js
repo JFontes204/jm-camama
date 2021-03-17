@@ -16,16 +16,23 @@ export default function Login() {
     try {
       if (username && password) {
         const response = await api.post('/logon', { username, password });
-        const { token, name } = response.data;
+        const { token, name, status, error } = response.data;
         if (token !== undefined) {
           // Set object into localStorage
           localStorage.setItem('token', JSON.stringify(token));
           localStorage.setItem('name', name);
           window.location.href = '/home';
         } else {
-          setToastMsg('Nome de utilizador ou palavra-passe incorrecta!');
-          setToastClasses('bg-warning text-white');
-          setToastShow(true);
+          if (status !== undefined && !JSON.parse(status)) {
+            setToastMsg(error);
+            setToastClasses('bg-warning text-white');
+            setToastShow(true);
+            return;
+          } else {
+            setToastMsg('Nome de utilizador ou palavra-passe incorrecta!');
+            setToastClasses('bg-warning text-white');
+            setToastShow(true);
+          }
         }
       } else {
         setToastMsg('Preencha os campos utilizador e palavra-passe!');
@@ -55,6 +62,9 @@ export default function Login() {
         <div className="inner-login">
           <form method="get">
             <div className="logo"></div>
+            <label style={{ fontWeight: 700, fontSize: 13, marginBottom: 15 }}>
+              SISTEMA INTEGRADO DE INFORMAÇÃO E MILITANTES
+            </label>
             <div className="form-group">
               <label>Nome de utilizador</label>
               <input

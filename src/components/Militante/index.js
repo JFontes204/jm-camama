@@ -1,27 +1,45 @@
 import React, { useState, useEffect } from 'react';
+import { Toast } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import api from '../../services/Api';
 import Loading from '../Loading';
 
 function Militante() {
+  const [toastShow, setToastShow] = useState(false);
+  const [toastMsg, setToastMsg] = useState('');
+  const [toastClasses, setToastClasses] = useState('');
   const [militantes, setMilitantes] = useState([]);
   useEffect(() => {
     getMilitantes();
   }, []);
 
   const getMilitantes = async () => {
-    const { access_token } = JSON.parse(localStorage.getItem('token'));
-    const config = {
-      headers: {
-        Authorization: 'Bearer ' + access_token,
-      },
-    };
-    const response = await api.get('/militantes', config);
-    militantes
-      ? setMilitantes(response.data)
-      : setMilitantes([...militantes, response.data]);
+    try {
+      const response = await api.get('/militantes', {
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem('token')).access_token
+          }`,
+        },
+      });
+      const { status, error } = response.data;
+      if (status !== undefined && !JSON.parse(status)) {
+        localStorage.clear();
+        setToastMsg(error);
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+        setTimeout(() => (window.location.href = '/goout'), 2800);
+        return;
+      }
+      setMilitantes(response.data);
+    } catch (err) {
+      if (/status code 401$/i.test(err)) {
+        setToastMsg('A sessão expirou! Sai e volte a entrar.');
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+      }
+    }
   };
-
   function tempoDeMilitancia(ano) {
     const data = new Date();
     return data.getFullYear() - ano;
@@ -31,6 +49,16 @@ function Militante() {
     <Loading
       myRender={() => (
         <>
+          <Toast
+            onClose={() => setToastShow(false)}
+            show={toastShow}
+            delay={2500}
+            autohide
+          >
+            <Toast.Body className={`${toastClasses}`}>
+              <strong>{toastMsg}</strong>
+            </Toast.Body>
+          </Toast>
           <div className="row content-header">
             <div className="col-lg-3 col-md-3 col-sm-4 col-xs-12">
               <Link
@@ -71,7 +99,7 @@ function Militante() {
                       <td>
                         <Link
                           className="text-link text-dark"
-                          /*  to={`/militante-update/${btoa(value.id)}`} */
+                          to={`/militante-update/${btoa(value.id)}`}
                         >
                           ver
                         </Link>

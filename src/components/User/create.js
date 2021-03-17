@@ -18,17 +18,14 @@ function UserCreate(props) {
 
   async function getMilitantes() {
     try {
-      const response = await api.get('/militantes', {
+      const response = await api.get('/militantes/all/any', {
         headers: {
           Authorization: `Bearer ${
             JSON.parse(localStorage.getItem('token')).access_token
           }`,
         },
       });
-
-      militantes
-        ? setMilitantes(response.data)
-        : setMilitantes([...militantes, response.data]);
+      setMilitantes(response.data);
     } catch (err) {
       if (/status code 401$/i.test(err)) {
         setToastMsg('A sessão expirou! Sai e volte a entrar.');

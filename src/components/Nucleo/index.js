@@ -32,7 +32,6 @@ function Nucleo() {
             }`,
           },
         });
-        console.log(response);
       }
       setNucleos(response.data);
     } catch (err) {
