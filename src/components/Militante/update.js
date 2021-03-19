@@ -20,12 +20,90 @@ function MilitanteUpdate() {
   const [comite_id, setComite_id] = useState(0);
   const [comites, setComites] = useState([]);
   const [estado, setEstado] = useState('');
+  const [departamentos, setDepartamentos] = useState([]);
+  const [departamento_id, setDepartamento_id] = useState('');
+  const [cargos, setCargos] = useState([]);
+  const [cargo_id, setCargo_id] = useState('');
+  const [genero, setGenero] = useState('');
   const { militante_id } = useParams();
 
   useEffect(() => {
     getComites();
     getMilitanteById(militante_id);
+    getDepartamentos();
   }, []);
+
+  async function getDepartamentos() {
+    try {
+      const response = await api.get(`/direccao`, {
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem('token')).access_token
+          }`,
+        },
+      });
+      const { status, error } = response.data;
+      if (status !== undefined && !JSON.parse(status)) {
+        localStorage.clear();
+        setToastMsg(error);
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+        setTimeout(() => (window.location.href = '/goout'), 2800);
+        return;
+      }
+      if (Object.keys(response.data).length) {
+        setDepartamentos(response.data);
+      }
+    } catch (err) {
+      if (/status code 401$/i.test(err)) {
+        setToastMsg('A sessão expirou! Sai e volte a entrar.');
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+      }
+    }
+  }
+
+  async function getCargos(depa_id) {
+    try {
+      const response = await api.get(`/funcaobydireccaoid/${depa_id}`, {
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem('token')).access_token
+          }`,
+        },
+      });
+      const { status, error } = response.data;
+      if (status !== undefined && !JSON.parse(status)) {
+        localStorage.clear();
+        setToastMsg(error);
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+        setTimeout(() => (window.location.href = '/goout'), 2800);
+        return;
+      }
+      if (Object.keys(response.data).length) {
+        const [{ funcao }] = response.data;
+        if (funcao.length) {
+          setCargos(funcao);
+        } else {
+          const depa = departamentos[departamento_id].sigla;
+
+          setCargos([
+            {
+              id: 0,
+              nome: `${depa} está sem cargos`,
+            },
+          ]);
+        }
+      }
+    } catch (err) {
+      if (/status code 401$/i.test(err)) {
+        setToastMsg('A sessão expirou! Sai e volte a entrar.');
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+      }
+    }
+  }
 
   async function getComites() {
     try {
@@ -36,9 +114,18 @@ function MilitanteUpdate() {
           }`,
         },
       });
-      comites
-        ? setComites(response.data)
-        : setComites([...comites, response.data]);
+      const { status, error } = response.data;
+      if (status !== undefined && !JSON.parse(status)) {
+        localStorage.clear();
+        setToastMsg(error);
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+        setTimeout(() => (window.location.href = '/goout'), 2800);
+        return;
+      }
+      if (Object.keys(response.data).length > 0) {
+        setComites(response.data);
+      }
     } catch (err) {
       if (/status code 401$/i.test(err)) {
         setToastMsg('A sessão expirou! Sai e volte a entrar.');
@@ -57,18 +144,29 @@ function MilitanteUpdate() {
           }`,
         },
       });
-      const [res] = response.data;
-      setNome(res.nome);
-      setEmail(res.email);
-      setEstado(res.estado);
-      setMorada(res.morada);
-      setTelefone1(res.telefone1);
-      setTelefone2(res.telefone2);
-      setData_nascimento(res.data_nascimento);
-      setAno_inicio_militancia(res.ano_inicio_militancia);
-      setComite_id(res.comite_id);
-      setGrupo_eleitoral_numero(res.grupo_eleitoral_numero);
-      setCartao_eleitoral_numero(res.cartao_eleitoral_numero);
+      const { status, error } = response.data;
+      if (status !== undefined && !JSON.parse(status)) {
+        localStorage.clear();
+        setToastMsg(error);
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+        setTimeout(() => (window.location.href = '/goout'), 2800);
+        return;
+      }
+      if (Object.keys(response.data).length > 0) {
+        const [res] = response.data;
+        setNome(res.nome);
+        setEmail(res.email);
+        setEstado(res.estado);
+        setMorada(res.morada);
+        setTelefone1(res.telefone1);
+        setTelefone2(res.telefone2);
+        setData_nascimento(res.data_nascimento);
+        setAno_inicio_militancia(res.ano_inicio_militancia);
+        setComite_id(res.comite_id);
+        setGrupo_eleitoral_numero(res.grupo_eleitoral_numero);
+        setCartao_eleitoral_numero(res.cartao_eleitoral_numero);
+      }
     } catch (err) {
       if (/status code 401$/i.test(err)) {
         setToastMsg('A sessão expirou! Sai e volte a entrar.');
@@ -93,6 +191,7 @@ function MilitanteUpdate() {
           ano_inicio_militancia,
           comite_id,
           estado,
+          genero,
           grupo_eleitoral_numero,
           cartao_eleitoral_numero,
         },
@@ -104,7 +203,34 @@ function MilitanteUpdate() {
           },
         }
       );
-      if (Object.keys(response.data).length > 0) {
+      const { status, error } = response.data;
+      if (status !== undefined && !JSON.parse(status)) {
+        localStorage.clear();
+        setToastMsg(error);
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+        setTimeout(() => (window.location.href = '/goout'), 2800);
+        return;
+      }
+      let res;
+      console.log(departamento_id, cargo_id);
+      if (
+        (departamento_id > 0 || departamento_id !== '') &&
+        (cargo_id > 0 || cargo_id !== '')
+      ) {
+        res = await api.post(
+          `/militantes/${militante_id}/direccao_funcao`,
+          { direccao_id: departamento_id, funcao_id: cargo_id },
+          {
+            headers: {
+              Authorization: `Bearer ${
+                JSON.parse(localStorage.getItem('token')).access_token
+              }`,
+            },
+          }
+        );
+      }
+      if (Object.keys(response.data).length) {
         setNome('');
         setEmail('');
         setMorada('');
@@ -116,6 +242,8 @@ function MilitanteUpdate() {
         setGrupo_eleitoral_numero('');
         setCartao_eleitoral_numero('');
         setEstado('');
+        setCargo_id(0);
+        setDepartamento_id(0);
         setToastMsg('Alterado com sucesso!');
         setToastClasses('text-dark');
         setToastShow(true);
@@ -180,6 +308,19 @@ function MilitanteUpdate() {
           </div>
           <div className="col-lg-4 col-md-6 col-sm-12">
             <div className="form-group">
+              <label>Género</label>
+              <select
+                onChange={(e) => setGenero(e.target.value)}
+                className="custom-select"
+              >
+                <option value="0">Escolhe um género</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+              </select>
+            </div>
+          </div>
+          <div className="col-lg-4 col-md-6 col-sm-12">
+            <div className="form-group">
               <label>Comité</label>
               <select
                 onChange={(e) => setComite_id(e.target.value)}
@@ -236,7 +377,7 @@ function MilitanteUpdate() {
           </div>
           <div className="col-lg-4 col-md-6 col-sm-12">
             <div className="form-group">
-              <label>Data de Ingresso</label>
+              <label>Ano de Ingresso</label>
               <input
                 type="text"
                 className="form-control"
@@ -293,6 +434,46 @@ function MilitanteUpdate() {
                 <option value="Activo">Activo</option>
                 <option value="Suspenso">Suspenso</option>
                 <option value="Em analise">Em analise</option>
+              </select>
+            </div>
+          </div>
+          <div className="col-lg-4 col-md-6 col-sm-12">
+            <div className="form-group">
+              <label>Departamento</label>
+              <select
+                className="custom-select"
+                onChange={(e) => {
+                  setDepartamento_id(e.target.value);
+                  setCargos([]);
+                  getCargos(e.target.value);
+                }}
+              >
+                <option value="-1">Escolhe um departamento</option>
+                {departamentos.map((value, key) => {
+                  return (
+                    <option key={key} value={value.id}>
+                      {value.nome}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+          </div>
+          <div className="col-lg-4 col-md-6 col-sm-12">
+            <div className="form-group">
+              <label>Cargo</label>
+              <select
+                className="custom-select"
+                onChange={(e) => setCargo_id(e.target.value)}
+              >
+                <option value="-1">Escolhe um cargo</option>
+                {cargos.map((value, key) => {
+                  return (
+                    <option key={key} value={value.id}>
+                      {value.nome}
+                    </option>
+                  );
+                })}
               </select>
             </div>
           </div>

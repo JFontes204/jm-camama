@@ -10,7 +10,7 @@ import {
   Card,
   Button,
 } from 'react-bootstrap';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../../services/Api';
 import Loading from '../Loading';
 import ListItems from './listItems';
@@ -23,6 +23,145 @@ function Settings() {
   const [toastClasses, setToastClasses] = useState('');
   const [settingKey, setSettingKey] = useState('home');
   const [data, setData] = useState([]);
+  const [nomeDireccao, setNomeDireccao] = useState('');
+  const [siglaDireccao, setSiglaDireccao] = useState('');
+  const [descricaoDireccao, setDescricaoDireccao] = useState('');
+  const [nomeFuncao, setNomeFuncao] = useState('');
+  const [siglaFuncao, setSiglaFuncao] = useState('');
+  const [descricaoFuncao, setDescricaoFuncao] = useState('');
+  const [departamentos, setDepartamentos] = useState([]);
+  const [departamento_id, setDepartamento_id] = useState(0);
+  const [cargos, setCargos] = useState([]);
+  const [cargo_id, setCargo_id] = useState(0);
+  const [comites, setComites] = useState([]);
+  const [idGeral, setIdGeral] = useState('');
+  const [nomeGeral, setNomeGeral] = useState('');
+  const [siglaGeral, setSiglaGeral] = useState('');
+  const [descricaoGeral, setDescricaoGeral] = useState('');
+  const [comite_id, setComite_id] = useState(0);
+
+  useEffect(() => {
+    getDepartamentos();
+    getComites();
+    getCargos();
+  }, []);
+
+  async function showModal(id) {
+    if (settingKey === 'direccao') {
+      const r = await getDepartamentos(id);
+      setIdGeral(btoa(r.id));
+      setNomeGeral(r.nome);
+      setSiglaGeral(r.sigla);
+      setDescricaoGeral(r.descricao);
+    } else if (settingKey === 'funcao') {
+      const r = await getCargos(id);
+      setIdGeral(btoa(r.id));
+      setNomeGeral(r.nome);
+      setSiglaGeral(r.sigla);
+      setDescricaoGeral(r.descricao);
+    }
+    setModalShow(true);
+  }
+
+  async function getDepartamentos(id) {
+    if (id === undefined) {
+      id = '';
+    }
+    try {
+      const response = await api.get(`/direccao/${id}`, {
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem('token')).access_token
+          }`,
+        },
+      });
+      const { status, error } = response.data;
+      if (status !== undefined && !JSON.parse(status)) {
+        localStorage.clear();
+        setToastMsg(error);
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+        setTimeout(() => (window.location.href = '/goout'), 2800);
+        return;
+      }
+      if (Object.keys(response.data).length && id === '') {
+        setDepartamentos(response.data);
+      } else {
+        return response.data[0];
+      }
+    } catch (err) {
+      if (/status code 401$/i.test(err)) {
+        setToastMsg('A sessão expirou! Sai e volte a entrar.');
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+      }
+    }
+  }
+
+  async function getCargos(id) {
+    if (id === undefined) {
+      id = '';
+    }
+    try {
+      const response = await api.get(`/funcao`, {
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem('token')).access_token
+          }`,
+        },
+      });
+      const { status, error } = response.data;
+      if (status !== undefined && !JSON.parse(status)) {
+        localStorage.clear();
+        setToastMsg(error);
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+        setTimeout(() => (window.location.href = '/goout'), 2800);
+        return;
+      }
+      if (Object.keys(response.data).length && id === '') {
+        setCargos(response.data);
+      } else {
+        return response.data[0];
+      }
+    } catch (err) {
+      if (/status code 401$/i.test(err)) {
+        setToastMsg('A sessão expirou! Sai e volte a entrar.');
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+      }
+    }
+  }
+
+  async function getComites() {
+    try {
+      const response = await api.get('/comites/all/any', {
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem('token')).access_token
+          }`,
+        },
+      });
+      const { status, error } = response.data;
+      if (status !== undefined && !JSON.parse(status)) {
+        localStorage.clear();
+        setToastMsg(error);
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+        setTimeout(() => (window.location.href = '/goout'), 2800);
+        return;
+      }
+      if (Object.keys(response.data).length) {
+        setComites(response.data);
+      }
+    } catch (err) {
+      if (/status code 401$/i.test(err)) {
+        setToastMsg('A sessão expirou! Sai e volte a entrar.');
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+      }
+    }
+  }
 
   function handleClose() {
     setModalShow(false);
@@ -91,10 +230,116 @@ function Settings() {
               <Col sm={9}>
                 <Tab.Content>
                   <Tab.Pane eventKey="lista">
-                    <Loading myRender={() => <ListItems data={data} />} />
+                    <Loading
+                      myRender={() => (
+                        <ListItems data={data} showModal={showModal} />
+                      )}
+                    />
                   </Tab.Pane>
-                  <Tab.Pane eventKey="nova">Nova</Tab.Pane>
-                  <Tab.Pane eventKey="associar">Associar</Tab.Pane>
+                  <Tab.Pane eventKey="nova">
+                    <form>
+                      <h3>Nova direcção ou departamento</h3>
+                      <div className="row">
+                        <div className="col-lg-4 col-md-6 col-sm-12">
+                          <div className="form-group">
+                            <label>Nome da direcção</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Nome da direcção"
+                              value={nomeDireccao}
+                              onChange={(e) => setNomeDireccao(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-lg-4 col-md-6 col-sm-12">
+                          <div className="form-group">
+                            <label>Sigla</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Sigla"
+                              value={siglaDireccao}
+                              onChange={(e) => setSiglaDireccao(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-lg-4 col-md-6 col-sm-12">
+                          <div className="form-group">
+                            <label>Descrição</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Descrição"
+                              value={descricaoDireccao}
+                              onChange={(e) =>
+                                setDescricaoDireccao(e.target.value)
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        type="submit"
+                        className="btn btn-master btn-lg btn-block"
+                        onClick={() => {}}
+                      >
+                        Criar
+                      </button>
+                    </form>
+                  </Tab.Pane>
+                  <Tab.Pane eventKey="associar">
+                    <form>
+                      <h3>Associar direcção ao comité</h3>
+                      <div className="row">
+                        <div className="col-lg-4 col-md-6 col-sm-12">
+                          <div className="form-group">
+                            <label>Comité</label>
+                            <select
+                              onChange={(e) => setComite_id(e.target.value)}
+                              className="custom-select"
+                            >
+                              <option key="-1" value="0">
+                                Escolhe um Comité
+                              </option>
+                              {comites.map((value, key) => (
+                                <option key={key} value={value.id}>
+                                  {value.nome}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                        <div className="col-lg-4 col-md-6 col-sm-12">
+                          <div className="form-group">
+                            <label>Direcção</label>
+                            <select
+                              className="custom-select"
+                              onChange={(e) => {
+                                setDepartamento_id(e.target.value);
+                              }}
+                            >
+                              <option value="-1">Escolhe uma direcção</option>
+                              {departamentos.map((value, key) => {
+                                return (
+                                  <option key={key} value={value.id}>
+                                    {value.nome}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                          </div>
+                        </div>
+                        <button
+                          type="submit"
+                          className="btn btn-master btn-lg btn-block"
+                          onClick={() => {}}
+                        >
+                          Associar
+                        </button>
+                      </div>
+                    </form>
+                  </Tab.Pane>
                 </Tab.Content>
               </Col>
             </Row>
@@ -119,13 +364,115 @@ function Settings() {
               <Col sm={9}>
                 <Tab.Content>
                   <Tab.Pane eventKey="listar">
-                    <Loading myRender={() => <ListItems data={data} />} />
+                    <Loading
+                      myRender={() => (
+                        <ListItems data={data} showModal={showModal} />
+                      )}
+                    />
                   </Tab.Pane>
                   <Tab.Pane eventKey="nova">
-                    Criação de nova função ou cargo.
+                    <form>
+                      <h3>Nova função ou cargo</h3>
+                      <div className="row">
+                        <div className="col-lg-4 col-md-6 col-sm-12">
+                          <div className="form-group">
+                            <label>Nome da função</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Nome da função"
+                              value={nomeFuncao}
+                              onChange={(e) => setNomeFuncao(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-lg-4 col-md-6 col-sm-12">
+                          <div className="form-group">
+                            <label>Sigla</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Sigla"
+                              value={siglaFuncao}
+                              onChange={(e) => setSiglaFuncao(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                        <div className="col-lg-4 col-md-6 col-sm-12">
+                          <div className="form-group">
+                            <label>Descrição</label>
+                            <input
+                              type="text"
+                              className="form-control"
+                              placeholder="Descrição"
+                              value={descricaoFuncao}
+                              onChange={(e) =>
+                                setDescricaoFuncao(e.target.value)
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        type="submit"
+                        className="btn btn-master btn-lg btn-block"
+                        onClick={() => {}}
+                      >
+                        Criar
+                      </button>
+                    </form>
                   </Tab.Pane>
                   <Tab.Pane eventKey="associar">
-                    Associar função à direcção ou à militante
+                    <form>
+                      <h3>Associar função à direcção</h3>
+                      <div className="row">
+                        <div className="col-lg-4 col-md-6 col-sm-12">
+                          <div className="form-group">
+                            <label>Direcção</label>
+                            <select
+                              className="custom-select"
+                              onChange={(e) => {
+                                setDepartamento_id(e.target.value);
+                              }}
+                            >
+                              <option value="-1">Escolhe uma direcção</option>
+                              {departamentos.map((value, key) => {
+                                return (
+                                  <option key={key} value={value.id}>
+                                    {value.nome}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                          </div>
+                        </div>
+                        <div className="col-lg-4 col-md-6 col-sm-12">
+                          <div className="form-group">
+                            <label>Função</label>
+                            <select
+                              className="custom-select"
+                              onChange={(e) => setCargo_id(e.target.value)}
+                            >
+                              <option value="-1">Escolhe uma função</option>
+                              {cargos.map((value, key) => {
+                                return (
+                                  <option key={key} value={value.id}>
+                                    {value.nome}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                          </div>
+                        </div>
+                        <button
+                          type="submit"
+                          className="btn btn-master btn-lg btn-block"
+                          onClick={() => {}}
+                        >
+                          Associar
+                        </button>
+                      </div>
+                    </form>
                   </Tab.Pane>
                 </Tab.Content>
               </Col>
@@ -141,9 +488,7 @@ function Settings() {
                 </Accordion.Toggle>
               </Card.Header>
               <Accordion.Collapse eventKey="0">
-                <Card.Body>
-                  <Loading myRender={() => <ListItems data={[]} />} />
-                </Card.Body>
+                <Card.Body>exemplo</Card.Body>
               </Accordion.Collapse>
             </Card>
             <Card>
@@ -175,12 +520,52 @@ function Settings() {
         onHide={handleClose}
         backdrop="static"
         keyboard={false}
+        size="lg"
       >
         <Modal.Header closeButton>
           <Modal.Title className="text-dark">Alerta - SIIM</Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-dark">
-          Tem certeza que deseja realizar as alterações?
+          <form>
+            <div className="row">
+              <div className="col-lg-6 col-md-6 col-sm-12">
+                <div className="form-group">
+                  <label>Nome</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Nome da direcção"
+                    value={nomeGeral}
+                    onChange={(e) => setNomeDireccao(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="col-lg-6 col-md-6 col-sm-12">
+                <div className="form-group">
+                  <label>Sigla</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Sigla"
+                    value={siglaGeral}
+                    onChange={(e) => setSiglaDireccao(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="col-lg-6 col-md-6 col-sm-12">
+                <div className="form-group">
+                  <label>Descrição</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Descrição"
+                    value={descricaoGeral}
+                    onChange={(e) => setDescricaoDireccao(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          </form>
         </Modal.Body>
         <Modal.Footer>
           <button className="btn btn-second" onClick={handleClose}>
@@ -190,7 +575,7 @@ function Settings() {
             className="btn btn-master"
             onClick={() => setModalShow(false)}
           >
-            Confirmar
+            Alterar
           </button>
         </Modal.Footer>
       </Modal>

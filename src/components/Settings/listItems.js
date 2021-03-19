@@ -1,6 +1,7 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
-export default function ListItems({ data }) {
+export default function ListItems({ data, showModal }) {
   return (
     <>
       <table className="table table-striped table-inverse table-responsive tb-style">
@@ -21,12 +22,13 @@ export default function ListItems({ data }) {
                   <td>{value.nome}</td>
                   <td>{value.sigla}</td>
                   <td>
-                    <a
+                    <Link
+                      to="#"
                       className="text-link text-dark"
-                      href={'/#/' + btoa(value.id)}
+                      onClick={() => showModal(btoa(value.id))}
                     >
                       editar
-                    </a>
+                    </Link>
                   </td>
                 </tr>
               );

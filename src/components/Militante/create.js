@@ -9,6 +9,7 @@ function User() {
   const [toastClasses, setToastClasses] = useState('');
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
+  const [genero, setGenero] = useState('');
   const [morada, setMorada] = useState('');
   const [telefone1, setTelefone1] = useState('');
   const [telefone2, setTelefone2] = useState('');
@@ -25,6 +26,7 @@ function User() {
         {
           nome,
           email,
+          genero,
           morada,
           telefone1,
           telefone2: telefone2 === '' ? null : telefone2,
@@ -109,6 +111,19 @@ function User() {
           </div>
           <div className="col-lg-4 col-md-6 col-sm-12">
             <div className="form-group">
+              <label>Género</label>
+              <select
+                onChange={(e) => setGenero(e.target.value)}
+                className="custom-select"
+              >
+                <option value="0">Escolhe um género</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+              </select>
+            </div>
+          </div>
+          <div className="col-lg-4 col-md-6 col-sm-12">
+            <div className="form-group">
               <label>Telefone 1</label>
               <input
                 type="text"
@@ -147,7 +162,7 @@ function User() {
           </div>
           <div className="col-lg-4 col-md-6 col-sm-12">
             <div className="form-group">
-              <label>Data de Ingresso</label>
+              <label>Ano de Ingresso</label>
               <input
                 type="text"
                 className="form-control"
