@@ -99,7 +99,8 @@ function Militante() {
                       <td>
                         <Link
                           className="text-link text-dark"
-                          to={`/militante-update/${btoa(value.id)}`}
+                          to={'/militante-viewer/' + btoa(value.id)}
+                          /* to={`/militante-update/${btoa(value.id)}`} */
                         >
                           ver
                         </Link>

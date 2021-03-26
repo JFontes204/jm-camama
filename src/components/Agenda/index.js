@@ -80,12 +80,13 @@ function Agenda() {
                       <td>{dataFormate(value.data_e_hora)}</td>
                       <td>{value.comites.nome}</td>
                       <td>
-                        <a
+                        <Link
                           className="text-link text-dark"
-                          href={'/agenda-update/' + btoa(value.id)}
+                          to={'/agenda-viewer/' + btoa(value.id)}
+                          /*  to={'/agenda-update/' + btoa(value.id)} */
                         >
                           ver
-                        </a>
+                        </Link>
                       </td>
                     </tr>
                   );

@@ -77,12 +77,13 @@ function Comite() {
                       <td>{value.comite_numero}</td>
                       <td>{value.localizacao}</td>
                       <td>
-                        <a
+                        <Link
                           className="text-link text-dark"
-                          href={'/comite-update/' + btoa(value.id)}
+                          to={'/comite-viewer/' + btoa(value.id)}
+                          /* to={'/comite-update/' + btoa(value.id)} */
                         >
                           ver
-                        </a>
+                        </Link>
                       </td>
                     </tr>
                   );

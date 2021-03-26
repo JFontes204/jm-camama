@@ -89,7 +89,8 @@ function Nucleo() {
                       <td>
                         <Link
                           className="text-link text-dark"
-                          to={`/nucleo-update/${btoa(value.id)}`}
+                          to={'/nucleo-viewer/' + btoa(value.id)}
+                          /*  to={`/nucleo-update/${btoa(value.id)}`} */
                         >
                           ver
                         </Link>

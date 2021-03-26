@@ -64,7 +64,7 @@ function NucleoUpdate() {
           },
         }
       );
-      if (Object.keys(response.data).length > 0) {
+      if (Object.keys(response.data).length) {
         setNome('');
         setSigla('');
         setEstado('');

@@ -38,6 +38,9 @@ function Settings() {
   const [nomeGeral, setNomeGeral] = useState('');
   const [siglaGeral, setSiglaGeral] = useState('');
   const [descricaoGeral, setDescricaoGeral] = useState('');
+  const [nomeSelected, setNomeSelected] = useState('');
+  const [siglaSelected, setSiglaSelected] = useState('');
+  const [descricaoSelected, setDescricaoSelected] = useState('');
   const [comite_id, setComite_id] = useState(0);
 
   useEffect(() => {
@@ -48,27 +51,161 @@ function Settings() {
 
   async function showModal(id) {
     if (settingKey === 'direccao') {
-      const r = await getDepartamentos(id);
-      setIdGeral(btoa(r.id));
-      setNomeGeral(r.nome);
-      setSiglaGeral(r.sigla);
-      setDescricaoGeral(r.descricao);
+      const response = await getDepartamentos(id);
+      setIdGeral(btoa(response.id));
+      setNomeGeral(response.nome);
+      setSiglaGeral(response.sigla);
+      setDescricaoGeral(response.descricao);
     } else if (settingKey === 'funcao') {
-      const r = await getCargos(id);
-      setIdGeral(btoa(r.id));
-      setNomeGeral(r.nome);
-      setSiglaGeral(r.sigla);
-      setDescricaoGeral(r.descricao);
+      const response = await getCargos(id);
+      setIdGeral(btoa(response.id));
+      setNomeGeral(response.nome);
+      setSiglaGeral(response.sigla);
+      setDescricaoGeral(response.descricao);
     }
     setModalShow(true);
   }
 
+  async function create(e) {
+    e.preventDefault();
+    try {
+      const response = await api.post(
+        `/${settingKey}`,
+        {
+          nome: settingKey === 'direccao' ? nomeDireccao : nomeFuncao,
+          sigla: settingKey === 'direccao' ? siglaDireccao : siglaFuncao,
+          descricao:
+            settingKey === 'direccao' ? descricaoDireccao : descricaoFuncao,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${
+              JSON.parse(localStorage.getItem('token')).access_token
+            }`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        settingKey === 'direccao' ? setNomeDireccao('') : setNomeFuncao('');
+        settingKey === 'direccao' ? setSiglaDireccao('') : setSiglaFuncao('');
+        settingKey === 'direccao'
+          ? setDescricaoDireccao('')
+          : setDescricaoFuncao('');
+        setToastMsg('Criado com sucesso!');
+        setToastClasses('text-dark');
+        setToastShow(true);
+        setTimeout(() => (window.location.href = '/settings'), 2000);
+      } else {
+        setToastMsg('Falha na criação!');
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+      }
+    } catch (err) {
+      if (/status code 401$/i.test(err)) {
+        setToastMsg('A sessão expirou! Sai e volte a entrar.');
+      } else {
+        setToastMsg('Falha na criação!');
+      }
+      setToastClasses('bg-warning text-white');
+      setToastShow(true);
+    }
+  }
+
+  async function update() {
+    try {
+      const response = await api.put(
+        `/${settingKey}/${idGeral}`,
+        {
+          nome: nomeGeral,
+          sigla: siglaGeral,
+          descricao: descricaoGeral,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${
+              JSON.parse(localStorage.getItem('token')).access_token
+            }`,
+          },
+        }
+      );
+      setModalShow(false);
+      if (response.status === 200) {
+        setIdGeral('');
+        setNomeGeral('');
+        setSiglaGeral('');
+        setDescricaoGeral('');
+        setToastMsg(response.data);
+        setToastClasses('text-dark');
+        setToastShow(true);
+        setTimeout(() => (window.location.href = '/settings'), 2000);
+      } else {
+        setToastMsg('Falha ao fazer as alterações!');
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+      }
+    } catch (err) {
+      setModalShow(false);
+      if (/status code 401$/i.test(err)) {
+        setToastMsg('A sessão expirou! Sai e volte a entrar.');
+      } else {
+        setToastMsg('Falha ao fazer as alterações!');
+      }
+      setToastClasses('bg-warning text-white');
+      setToastShow(true);
+    }
+  }
+
+  async function associete(e) {
+    e.preventDefault();
+    try {
+      const path =
+        settingKey === 'direccao'
+          ? `/comites/${comite_id}/direccao`
+          : `/direccao/${departamento_id}/funcao`;
+      const data = {
+        nome: nomeSelected,
+        sigla: siglaSelected,
+        descricao: descricaoSelected,
+      };
+      const response = await api.post(path, data, {
+        headers: {
+          Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem('token')).access_token
+          }`,
+        },
+      });
+      if (response.status === 200) {
+        setNomeSelected('');
+        setSiglaSelected('');
+        setDescricaoSelected('');
+        setToastMsg('Alterado com sucesso!');
+        setToastClasses('text-dark');
+        setToastShow(true);
+        setTimeout(() => (window.location.href = '/settings'), 2000);
+      } else {
+        setToastMsg('Falha ao fazer as alterações!');
+        setToastClasses('bg-warning text-white');
+        setToastShow(true);
+      }
+    } catch (err) {
+      setModalShow(false);
+      if (/status code 401$/i.test(err)) {
+        setToastMsg('A sessão expirou! Sai e volte a entrar.');
+      } else {
+        setToastMsg('Falha ao fazer as alterações!');
+      }
+      setToastClasses('bg-warning text-white');
+      setToastShow(true);
+    }
+  }
+
   async function getDepartamentos(id) {
-    if (id === undefined) {
-      id = '';
+    let path = `/direccao`;
+    if (id !== undefined) {
+      path = `/direccao/${id}`;
     }
     try {
-      const response = await api.get(`/direccao/${id}`, {
+      const response = await api.get(path, {
         headers: {
           Authorization: `Bearer ${
             JSON.parse(localStorage.getItem('token')).access_token
@@ -84,7 +221,7 @@ function Settings() {
         setTimeout(() => (window.location.href = '/goout'), 2800);
         return;
       }
-      if (Object.keys(response.data).length && id === '') {
+      if (response.status === 200 && id === undefined) {
         setDepartamentos(response.data);
       } else {
         return response.data[0];
@@ -99,11 +236,12 @@ function Settings() {
   }
 
   async function getCargos(id) {
-    if (id === undefined) {
-      id = '';
+    let path = `/funcao`;
+    if (id !== undefined) {
+      path = `/funcao/${id}`;
     }
     try {
-      const response = await api.get(`/funcao`, {
+      const response = await api.get(path, {
         headers: {
           Authorization: `Bearer ${
             JSON.parse(localStorage.getItem('token')).access_token
@@ -119,7 +257,7 @@ function Settings() {
         setTimeout(() => (window.location.href = '/goout'), 2800);
         return;
       }
-      if (Object.keys(response.data).length && id === '') {
+      if (response.status === 200 && id === undefined) {
         setCargos(response.data);
       } else {
         return response.data[0];
@@ -170,6 +308,20 @@ function Settings() {
     setToastShow(true);
   }
 
+  async function changeHire(id) {
+    let response;
+    if (settingKey === 'direccao') {
+      setDepartamento_id(btoa(id));
+      response = await getDepartamentos(btoa(id));
+    } else if (settingKey === 'funcao') {
+      setCargo_id(btoa(id));
+      response = await getCargos(btoa(id));
+    }
+    setNomeSelected(response.nome);
+    setSiglaSelected(response.sigla);
+    setDescricaoSelected(response.descricao);
+  }
+
   async function handleItems(key) {
     setSettingKey(key);
     try {
@@ -209,7 +361,7 @@ function Settings() {
         activeKey={settingKey}
         onSelect={(k) => handleItems(k)}
         mountOnEnter={true}
-        unmountOnExit={true}
+        /* unmountOnExit={true} */
       >
         <Tab eventKey="direccao" title="Direcções" className="pt-3">
           <Tab.Container id="left-tabs-example" defaultActiveKey="lista">
@@ -282,7 +434,7 @@ function Settings() {
                       <button
                         type="submit"
                         className="btn btn-master btn-lg btn-block"
-                        onClick={() => {}}
+                        onClick={create}
                       >
                         Criar
                       </button>
@@ -296,7 +448,9 @@ function Settings() {
                           <div className="form-group">
                             <label>Comité</label>
                             <select
-                              onChange={(e) => setComite_id(e.target.value)}
+                              onChange={(e) =>
+                                setComite_id(btoa(e.target.value))
+                              }
                               className="custom-select"
                             >
                               <option key="-1" value="0">
@@ -316,7 +470,7 @@ function Settings() {
                             <select
                               className="custom-select"
                               onChange={(e) => {
-                                setDepartamento_id(e.target.value);
+                                changeHire(e.target.value);
                               }}
                             >
                               <option value="-1">Escolhe uma direcção</option>
@@ -333,7 +487,7 @@ function Settings() {
                         <button
                           type="submit"
                           className="btn btn-master btn-lg btn-block"
-                          onClick={() => {}}
+                          onClick={associete}
                         >
                           Associar
                         </button>
@@ -416,7 +570,7 @@ function Settings() {
                       <button
                         type="submit"
                         className="btn btn-master btn-lg btn-block"
-                        onClick={() => {}}
+                        onClick={create}
                       >
                         Criar
                       </button>
@@ -432,7 +586,7 @@ function Settings() {
                             <select
                               className="custom-select"
                               onChange={(e) => {
-                                setDepartamento_id(e.target.value);
+                                setDepartamento_id(btoa(e.target.value));
                               }}
                             >
                               <option value="-1">Escolhe uma direcção</option>
@@ -451,7 +605,7 @@ function Settings() {
                             <label>Função</label>
                             <select
                               className="custom-select"
-                              onChange={(e) => setCargo_id(e.target.value)}
+                              onChange={(e) => changeHire(e.target.value)}
                             >
                               <option value="-1">Escolhe uma função</option>
                               {cargos.map((value, key) => {
@@ -467,7 +621,7 @@ function Settings() {
                         <button
                           type="submit"
                           className="btn btn-master btn-lg btn-block"
-                          onClick={() => {}}
+                          onClick={associete}
                         >
                           Associar
                         </button>
@@ -536,7 +690,7 @@ function Settings() {
                     className="form-control"
                     placeholder="Nome da direcção"
                     value={nomeGeral}
-                    onChange={(e) => setNomeDireccao(e.target.value)}
+                    onChange={(e) => setNomeGeral(e.target.value)}
                   />
                 </div>
               </div>
@@ -548,7 +702,7 @@ function Settings() {
                     className="form-control"
                     placeholder="Sigla"
                     value={siglaGeral}
-                    onChange={(e) => setSiglaDireccao(e.target.value)}
+                    onChange={(e) => setSiglaGeral(e.target.value)}
                   />
                 </div>
               </div>
@@ -560,7 +714,7 @@ function Settings() {
                     className="form-control"
                     placeholder="Descrição"
                     value={descricaoGeral}
-                    onChange={(e) => setDescricaoDireccao(e.target.value)}
+                    onChange={(e) => setDescricaoGeral(e.target.value)}
                   />
                 </div>
               </div>
@@ -571,10 +725,7 @@ function Settings() {
           <button className="btn btn-second" onClick={handleClose}>
             Cancelar
           </button>
-          <button
-            className="btn btn-master"
-            onClick={() => setModalShow(false)}
-          >
+          <button className="btn btn-master" onClick={update}>
             Alterar
           </button>
         </Modal.Footer>

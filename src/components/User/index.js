@@ -79,6 +79,7 @@ function User() {
                       <td>
                         <Link
                           className="text-link text-dark"
+                          to={'/user-viewer/' + btoa(value.id)}
                           /* to={`/user-update/${btoa(value.id)}`} */
                         >
                           ver
