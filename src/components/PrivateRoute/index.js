@@ -6,9 +6,9 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
     <Route
       {...rest}
       render={(props) => {
-        const { success, error } = isAuthenticated();
+        const { success, error, definicoes } = isAuthenticated();
         if (success) {
-          return <Component {...props} />;
+          return <Component {...props} settings={definicoes} />;
         } else {
           console.log('error:', error);
           window.location.href = '/';

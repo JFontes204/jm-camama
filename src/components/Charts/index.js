@@ -17,7 +17,7 @@ function LineChart({ data, series, axes }) {
   );
 }
 
-function Charts() {
+function Charts({ settings }) {
   const data = React.useMemo(
     () => [
       {
@@ -113,47 +113,76 @@ function Charts() {
   return (
     <Loading
       myRender={() => (
-        <Tabs defaultActiveKey="provincias" id="uncontrolled-tab-example">
-          <Tab eventKey="provincias" title="Provincias">
-            <h3>Novos militantes por província</h3>
-            <LineChart data={data} series={series} axes={axes} />
-          </Tab>
-          <Tab eventKey="municipios" title="Municipios">
-            <h3>Novos militantes por município</h3>
-            <LineChart data={data1} series={series} axes={axes1} />
-          </Tab>
-          <Tab eventKey="distritos" title="Distritos">
-            <h3>Tab 3</h3>
-            <nav aria-label="Page navigation example">
-              <ul className="pagination justify-content-center">
-                <li className="page-item disabled">
-                  <NavLink className="page-link" to="/charts" tabIndex={-1}>
-                    Anterior
-                  </NavLink>
-                </li>
-                <li className="page-item">
-                  <NavLink className="page-link" to="/charts">
-                    1
-                  </NavLink>
-                </li>
-                <li className="page-item">
-                  <NavLink className="page-link" to="/charts">
-                    2
-                  </NavLink>
-                </li>
-                <li className="page-item">
-                  <NavLink className="page-link" to="/charts">
-                    3
-                  </NavLink>
-                </li>
-                <li className="page-item">
-                  <NavLink className="page-link" to="/charts">
-                    Próximo
-                  </NavLink>
-                </li>
-              </ul>
-            </nav>
-          </Tab>
+        <Tabs>
+          {settings.charts.sede ? (
+            <Tab eventKey="sede" title="Comité Sede">
+              <h3>Comité Sede</h3>
+              <LineChart data={data} series={series} axes={axes} />
+            </Tab>
+          ) : null}
+          {settings.charts.provincia ? (
+            <Tab eventKey="provincias" title="Comités Provinciais">
+              <h3>Dados a nível províncial</h3>
+              <LineChart data={data} series={series} axes={axes} />
+            </Tab>
+          ) : null}
+
+          {settings.charts.municipio ? (
+            <Tab eventKey="municipios" title="Comités Municipais">
+              <h3>Dados a nível municípal</h3>
+              <LineChart data={data1} series={series} axes={axes1} />
+            </Tab>
+          ) : null}
+
+          {settings.charts.distrito ? (
+            <Tab eventKey="distritos" title="Comités Distritais">
+              <h3>Dados a nível distrital</h3>
+              <LineChart data={data1} series={series} axes={axes1} />
+              <nav aria-label="Page navigation example">
+                <ul className="pagination justify-content-center">
+                  <li className="page-item disabled">
+                    <NavLink className="page-link" to="/charts" tabIndex={-1}>
+                      Anterior
+                    </NavLink>
+                  </li>
+                  <li className="page-item">
+                    <NavLink className="page-link" to="/charts">
+                      1
+                    </NavLink>
+                  </li>
+                  <li className="page-item">
+                    <NavLink className="page-link" to="/charts">
+                      2
+                    </NavLink>
+                  </li>
+                  <li className="page-item">
+                    <NavLink className="page-link" to="/charts">
+                      3
+                    </NavLink>
+                  </li>
+                  <li className="page-item">
+                    <NavLink className="page-link" to="/charts">
+                      Próximo
+                    </NavLink>
+                  </li>
+                </ul>
+              </nav>
+            </Tab>
+          ) : null}
+
+          {settings.charts.local ? (
+            <Tab eventKey="locais" title="Comités Local">
+              <h3>Dados a nível dos comités locais</h3>
+              <LineChart data={data1} series={series} axes={axes1} />
+            </Tab>
+          ) : null}
+
+          {settings.charts.nucleo ? (
+            <Tab eventKey="nucleos" title="Núcleos">
+              <h3>Dados a nível dos comités locais</h3>
+              <LineChart data={data1} series={series} axes={axes1} />
+            </Tab>
+          ) : null}
         </Tabs>
       )}
     />

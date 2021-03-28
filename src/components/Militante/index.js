@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import api from '../../services/Api';
 import Loading from '../Loading';
 
-function Militante() {
+function Militante({ settings }) {
   const [toastShow, setToastShow] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [toastClasses, setToastClasses] = useState('');
@@ -61,12 +61,16 @@ function Militante() {
           </Toast>
           <div className="row content-header">
             <div className="col-lg-3 col-md-3 col-sm-4 col-xs-12">
-              <Link
-                className="text-link text-link-view"
-                to={'/militante-create'}
-              >
-                <button className="btn btn-master mb-1">Novo Militante</button>
-              </Link>
+              {settings.militante.create ? (
+                <Link
+                  className="text-link text-link-view"
+                  to={'/militante-create'}
+                >
+                  <button className="btn btn-master mb-1">
+                    Novo Militante
+                  </button>
+                </Link>
+              ) : null}
             </div>
             <h1 className="col-lg-9 col-md-9 col-sm-8 col-xs-12">
               Lista de Militantes

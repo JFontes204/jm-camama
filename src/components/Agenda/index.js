@@ -5,7 +5,7 @@ import { Toast } from 'react-bootstrap';
 import React, { useState, useEffect } from 'react';
 import dataFormate from '../../utils/dataFormate';
 
-function Agenda() {
+function Agenda({ settings }) {
   const [toastShow, setToastShow] = useState(false);
   const [toastMsg, setToastMsg] = useState('');
   const [toastClasses, setToastClasses] = useState('');
@@ -50,9 +50,13 @@ function Agenda() {
           </Toast>
           <div className="row content-header">
             <div className="col-lg-3 col-md-3 col-sm-4 col-xs-12">
-              <Link to="/agenda-create" className="text-link text-link-view">
-                <button className="btn btn-master mb-1">Nova Actividade</button>
-              </Link>
+              {settings.agenda.create ? (
+                <Link to="/agenda-create" className="text-link text-link-view">
+                  <button className="btn btn-master mb-1">
+                    Nova Actividade
+                  </button>
+                </Link>
+              ) : null}
             </div>
             <h1 className="col-lg-9 col-md-9 col-sm-8 col-xs-12">
               Lista de actividades
