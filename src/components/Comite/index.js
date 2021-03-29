@@ -48,7 +48,7 @@ function Comite({ settings }) {
           </Toast>
           <div className="row content-header">
             <div className="col-lg-3 col-md-3 col-sm-4 col-xs-12">
-              {settings.comite.view ? (
+              {settings.comite.create ? (
                 <Link
                   className="text-link text-link-view"
                   to={'/comite-create'}
