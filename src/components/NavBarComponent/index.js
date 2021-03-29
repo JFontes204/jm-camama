@@ -5,7 +5,6 @@ import './style.css';
 
 const NavBarComponent = () => {
   const { definicoes: settings } = isAuthenticated();
-  console.log('settings:', settings);
   return (
     <Navbar className="navbar-light text-white" expand="sm">
       <div className="container">
