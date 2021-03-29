@@ -20,7 +20,7 @@ export default function Login() {
         if (token !== undefined) {
           // Set object into localStorage
           localStorage.setItem('definicoes', JSON.stringify(definicoes));
-
+          console.log('login:', definicoes);
           localStorage.setItem('token', JSON.stringify(token));
           localStorage.setItem('name', name);
           window.location.href = '/home';
