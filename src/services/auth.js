@@ -4,7 +4,6 @@ const isAuthenticated = () => {
   const { tipo_comite, direccao, funcao } = JSON.parse(
     localStorage.getItem('definicoes')
   );
-  console.log('definicoes:', { tipo_comite, direccao, funcao });
   let definicoes = {
     charts: {
       sede: false,
