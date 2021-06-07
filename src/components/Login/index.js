@@ -16,10 +16,18 @@ export default function Login() {
     try {
       if (username && password) {
         const response = await api.post('/logon', { username, password });
-        const { token, name, definicoes, status, error } = response.data;
+        const {
+          token,
+          name,
+          definicoes,
+          comite,
+          status,
+          error,
+        } = response.data;
         if (token !== undefined) {
           // Set object into localStorage
           localStorage.setItem('definicoes', JSON.stringify(definicoes));
+          localStorage.setItem('comite', JSON.stringify(comite));
           localStorage.setItem('token', JSON.stringify(token));
           localStorage.setItem('name', name);
           window.location.href = '/home';

@@ -176,7 +176,7 @@ function ComiteCreate() {
 
           <div className="col-lg-4 col-md-6 col-sm-12">
             <div className="form-group">
-              <label>Localização do Comité</label>
+              <label>Morada do Comité</label>
               <textarea
                 className="form-control"
                 value={localizacao}

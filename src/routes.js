@@ -90,7 +90,10 @@ export default function Routes() {
             <PrivateRoute path="/charts" component={Charts} />
             <PrivateRoute path="/profile" component={Settings} />
             <PrivateRoute path="/settings" component={Settings} />
-            <PrivateRoute path="/comite-actual" component={Settings} />
+            <PrivateRoute
+              component={ComiteViewer}
+              path="/comite-actual/:comite_id"
+            />
           </Switch>
         </div>
       </div>

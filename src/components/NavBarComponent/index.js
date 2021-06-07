@@ -62,7 +62,11 @@ const NavBarComponent = () => {
               <NavDropdown.Item href="/profile">
                 Perfil do utilizdor
               </NavDropdown.Item>
-              <NavDropdown.Item href="/comite-actual">
+              <NavDropdown.Item
+                href={`/comite-actual/${btoa(
+                  JSON.parse(localStorage.getItem('comite')).comite_id
+                )}`}
+              >
                 Comité actual
               </NavDropdown.Item>
               {settings.setting.view ? (

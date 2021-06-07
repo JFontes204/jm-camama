@@ -67,7 +67,7 @@ function Comite({ settings }) {
                 <th>#</th>
                 <th>Descrição</th>
                 <th>Comité nº</th>
-                <th>Localização</th>
+                <th>Morada</th>
                 <th>Acção</th>
               </tr>
             </thead>
